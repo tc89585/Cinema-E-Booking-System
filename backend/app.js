@@ -21,9 +21,7 @@ const db = mysql.createConnection({
 db.connect((err) => {
   if (err) {
     console.log(err);
-  }
-
-  console.log('Database connected');
+  } else console.log('Database connected');
 });
 
 app.get('/movies', async (req, res) => {
