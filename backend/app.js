@@ -11,11 +11,11 @@ const port = process.env.PORT || 3000;
 /*connect to database*/
 
 const db = mysql.createConnection({
-  host: 'cinema-booking-db.cexoykt5nvcs.us-east-2.rds.amazonaws.com',
+  host: 'cinema-db.cexoykt5nvcs.us-east-2.rds.amazonaws.com',
   port: '3306',
   user: 'admin',
   password: 'password',
-  database: 'mydb',
+  database: 'cinema_proj_db',
 });
 
 db.connect((err) => {
@@ -49,7 +49,8 @@ app.post('/createMovie', (req, res) => {
     trailer_picture,
     trailer_video,
     mpaa_rating,
-    show_dates_times,
+    show_date,
+    show_time,
   } = req.body;
 
   const query = `INSERT INTO movie (title, category, cast, director, producer, synopsis, reviews, trailer_picture, trailer_video, mpaa_rating, show_dates_times) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -67,7 +68,8 @@ app.post('/createMovie', (req, res) => {
       trailer_picture,
       trailer_video,
       mpaa_rating,
-      show_dates_times,
+      show_date,
+      show_time,
     ],
     (err, results) => {
       if (err) {
