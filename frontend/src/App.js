@@ -5,7 +5,6 @@ import Home from './Components/Home';
 import Login from './Components/Login'; 
 import Checkout from './Components/Checkout'; 
 import Book from './Components/Book'; 
-
 function App() {
   return (
     <Router>
@@ -13,7 +12,7 @@ function App() {
         <Route path="/" element={<Home/>} />
         <Route path="/Login" element={<Login/>} />
         <Route path="/Checkout" element={<Checkout />} />
-        <Route path="/Book" element={<Book />} />
+        <Route path="/Book" element={<Book/>} />
       </Routes>
     </Router>
   );
