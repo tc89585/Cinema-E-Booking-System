@@ -6,12 +6,14 @@
 
 .home{
 padding:1.5rem;
-background-color: rgb(53, 53, 53);
+background-color: rgb(99, 99, 99);
 }
+
 .card-list {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    margin-top: 40px;
   }
   
   .card {
@@ -65,11 +67,23 @@ padding-right: 3rem;
     display: flex;
     justify-content: space-between;
 }
-/* .login {
-    position: fixed;
-    top:0;
-    right:0;
-} */
+.login {
+  background-color: #000;
+  color: #fff;
+  padding: 5px 10px;
+  width: 50px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  /* Optional: Add a box shadow for depth */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.login:hover {
+  background-color: #0056b3;
+}
+  
 .book-button {
     background-color: #000;
     color: #fff;
@@ -86,7 +100,7 @@ padding-right: 3rem;
 
 
 .banner {
-    background-color: #3b3b3b; 
+    background-color: #1f1f1f; 
     color: #fff;
     padding: 20px;
     display: flex;
@@ -154,5 +168,15 @@ padding-right: 3rem;
     opacity: 0.5; /* Adjust the opacity to control the shine effect */
     z-index: -1; /* Place the gradient behind the banner content */
   }
-  
+  .toggle-button {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Adjust the gap between the buttons as needed */
+    margin-top: 30px;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; 
+  }
 
