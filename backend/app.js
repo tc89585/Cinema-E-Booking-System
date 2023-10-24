@@ -25,7 +25,7 @@ db.connect((err) => {
 });
 
 app.get('/movies', async (req, res) => {
-  db.query('SELECT * FROM movie', (err, results) => {
+  db.query('SELECT * FROM Movie', (err, results) => {
     if (err) {
       console.error(err);
     } else {
@@ -51,7 +51,7 @@ app.post('/createMovie', (req, res) => {
     show_time,
   } = req.body;
 
-  const query = `INSERT INTO movie (title, category, cast, director, producer, synopsis, reviews, trailer_picture, trailer_video, mpaa_rating, show_date, show_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `INSERT INTO Movie (title, category, cast, director, producer, synopsis, reviews, trailer_picture, trailer_video, mpaa_rating, show_date, show_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   db.query(
     query,
