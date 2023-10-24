@@ -25,7 +25,7 @@ db.connect((err) => {
 });
 
 app.get('/movies', async (req, res) => {
-  db.query('SELECT * FROM movie', (err, results) => {
+  db.query('SELECT * FROM Movie', (err, results) => {
     if (err) {
       console.error(err);
     } else {
