@@ -8,7 +8,7 @@ dotenv.config();
 app.use(express.json());
 app.use(
   cors({
-    origin: 'http://localhost:3001',
+    origin: 'http://localhost:3000',
   })
 );
 
@@ -50,14 +50,13 @@ app.post('/createMovie', (req, res) => {
     producer,
     synopsis,
     reviews,
-    trailer_picture,
-    trailer_video,
+    trailer_url,
     mpaa_rating,
     show_date,
     show_time,
   } = req.body;
 
-  const query = `INSERT INTO Movie (title, category, cast, director, producer, synopsis, reviews, trailer_picture, trailer_video, mpaa_rating, show_date, show_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `INSERT INTO Movie (title, category, cast, director, producer, synopsis, reviews, trailer_url, mpaa_rating, show_date, show_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   db.query(
     query,
@@ -69,8 +68,7 @@ app.post('/createMovie', (req, res) => {
       producer,
       synopsis,
       reviews,
-      trailer_picture,
-      trailer_video,
+      trailer_url,
       mpaa_rating,
       show_date,
       show_time,
