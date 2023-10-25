@@ -1,0 +1,55 @@
+.manage-promotions-container {
+    background-color: #f5f5f5;
+    padding: 20px;
+    margin: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-promotion-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  
+  .promotion-form .form-group {
+    margin-bottom: 10px;
+  }
+  
+  .promotion-form label {
+    display: block;
+    font-weight: bold;
+  }
+  
+  .promotion-form input[type="text"],
+  .promotion-form input[type="number"],
+  .promotion-form input[type="date"],
+  .promotion-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .promotion-form .add-to-system-button,
+  .promotion-form .add-and-send-email-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  .success-message {
+    color: #4caf50;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  
