@@ -19,6 +19,10 @@ User.init(
       type: DataTypes.ENUM('active', 'inactive'),
       defaultValue: 'active',
     },
+    is_subscribed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     sequelize,
