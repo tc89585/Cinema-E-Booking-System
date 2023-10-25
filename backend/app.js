@@ -2,11 +2,17 @@ const express = require('express');
 const app = express();
 const mysql = require('mysql');
 const dotenv = require('dotenv');
+const cors = require('cors');
 dotenv.config();
 
 app.use(express.json());
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+  })
+);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 /*connect to database*/
 
@@ -25,7 +31,7 @@ db.connect((err) => {
 });
 
 app.get('/movies', async (req, res) => {
-  db.query('SELECT * FROM movie', (err, results) => {
+  db.query('SELECT * FROM Movie', (err, results) => {
     if (err) {
       console.error(err);
     } else {
@@ -44,14 +50,13 @@ app.post('/createMovie', (req, res) => {
     producer,
     synopsis,
     reviews,
-    trailer_picture,
-    trailer_video,
+    trailer_url,
     mpaa_rating,
     show_date,
     show_time,
   } = req.body;
 
-  const query = `INSERT INTO movie (title, category, cast, director, producer, synopsis, reviews, trailer_picture, trailer_video, mpaa_rating, show_date, show_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `INSERT INTO Movie (title, category, cast, director, producer, synopsis, reviews, trailer_url, mpaa_rating, show_date, show_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   db.query(
     query,
@@ -63,8 +68,7 @@ app.post('/createMovie', (req, res) => {
       producer,
       synopsis,
       reviews,
-      trailer_picture,
-      trailer_video,
+      trailer_url,
       mpaa_rating,
       show_date,
       show_time,
