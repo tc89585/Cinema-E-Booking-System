@@ -16,7 +16,7 @@ function Home() {
   };
 
   const handleLogin = () => {
-    window.location.href = 'http://localhost:3001/login';
+    window.location.href = 'http://localhost:3000/login';
     setIsLoggedIn(false);
   };
 
@@ -29,7 +29,7 @@ function Home() {
 
   useEffect(() => {
     // Make a GET request to fetch movies from your backend
-    Axios.get('http://localhost:3000/movies')
+    Axios.get('http://localhost:8080/movies')
       .then((response) => {
         // Handle the response data by setting it to the state
         setMovies(response.data);
@@ -39,11 +39,11 @@ function Home() {
       });
   }, []);
 
-  const filteredMovies = movies.filter(
-    (movie) =>
-      movie.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      (showingNow ? movie.isCurrentlyShowing : !movie.isCurrentlyShowing)
-  );
+  const filteredMovies = movies.filter((movie) =>
+  (movie.title && movie.title.toLowerCase().includes(searchQuery)) &&
+  (showingNow ? movie.isCurrentlyShowing : !movie.isCurrentlyShowing)
+);
+
 
   return (
     <div className="home">
