@@ -3,6 +3,10 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 
 router.post('/', userController.createUser);
+router.post('/forgotPassword', userController.forgotPassword);
+router.post('/login', userController.loginUser);
+
+
 
 /* 
    1. implement loginUser function inside controllers/userController to login a user when they enter their email and password

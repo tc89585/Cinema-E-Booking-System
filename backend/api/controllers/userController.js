@@ -27,7 +27,7 @@ const createUser = async (req, res) => {
 
 
 
-const login = async (req, res) => {
+const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -107,5 +107,5 @@ const forgotPassword = async (req, res) => {
 //const editProfile = ...
 
 module.exports = { createUser };
-module.exports = { login };
+module.exports = { loginUser };
 module.exports = { forgotPassword };
