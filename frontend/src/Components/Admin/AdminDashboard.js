@@ -39,7 +39,7 @@ import { Link, Route, Routes } from 'react-router-dom';
 import ManageMovies from './ManageMovies';
 import ManageUsers from './ManageUsers';
 import ManagePromotions from './ManagePromotions';
-import './AdminDashboard.css';
+import '../Styles/AdminDashboard.css';
 
 function AdminDashboard() {
     return (

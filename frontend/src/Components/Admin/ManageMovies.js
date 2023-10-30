@@ -97,7 +97,7 @@
 // export default ManageMovies;
 
 import React, { useState } from 'react';
-import './ManageMovies.css';
+import '../Styles/ManageMovies.css';
 
 function ManageMovies() {
   const [movieData, setMovieData] = useState({
