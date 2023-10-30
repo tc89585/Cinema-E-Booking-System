@@ -103,9 +103,43 @@ const forgotPassword = async (req, res) => {
 
 
 
-//*TODO*
-//const editProfile = ...
 
-module.exports = { createUser };
-module.exports = { login };
-module.exports = { forgotPassword };
+const editProfile = async (req, res) => {
+  try {
+    // Retrieve the user's ID from the authenticated user
+    const userId = req.body.user_id;
+
+    // Retrieve the form data from the request
+    const { firstname, lastname, billing_address, password, payment_card, is_subscribed } = req.body;
+
+    // Query the database to get the current user's data using async/await syntax
+    const user = await User.findByPk(userId);
+
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Ensure users cannot modify their email address
+    user.firstname = firstname;
+    user.lastname = lastname;
+    user.billing_address = billing_address;
+    user.payment_card = payment_card;
+    user.is_subscribed = is_subscribed;
+
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
+    }
+
+    // Save the updated user information
+    const updatedUser = await user.save();
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+    console.error(error);
+  }
+};
+
+module.exports = { createUser, login, forgotPassword, editProfile };
