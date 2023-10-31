@@ -5,7 +5,7 @@ import Home from './Components/Home';
 import Login from './Components/Login';
 import Checkout from './Components/Checkout';
 import Book from './Components/Book';
-import AdminDashboard from './Components/AdminDashboard';
+import AdminDashboard from './Components/Admin/AdminDashboard';
 
 function App() {
   const port = process.env.PORT || 3001;

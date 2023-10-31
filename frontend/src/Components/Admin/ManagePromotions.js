@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ManagePromotions.css';
+import '../Styles/ManagePromotions.css';
 
 function ManagePromotions() {
   const [promotionData, setPromotionData] = useState({
