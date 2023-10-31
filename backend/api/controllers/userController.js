@@ -1,18 +1,11 @@
 const User = require('../models/UserModel');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 
 const createUser = async (req, res) => {
   try {
-    //hash pw
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
-    const user = await User.create({
-      ...req.body,
-      password: hashedPassword,
-    });
-
+    const user = await User.create(req.body);
+    
     res.status(201).json({
       message: 'User created successfully',
       userId: user.user_id,
@@ -24,30 +17,33 @@ const createUser = async (req, res) => {
   }
 };
 
-
-
-
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     // Find the user by their email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ where: { email: email } });
 
     if (!user) {
       // User with the provided email does not exist
-      return res.status(401).json({ message: 'Authentication failed' });
+      return res.status(401).json({ message: 'Email: Authentication failed' });
     }
 
-    // Compare the entered password with the hashed password in the database
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (user.password === password) {
+      // Passwords match, user is authenticated
+      console.log("true is match");
+    } else {
+      // Passwords do not match
+      console.log("user.password:", user.password, "password:", password);
+      console.log("false not a match");
+    }
 
-    if (passwordMatch) {
+    if (user.password === password) {
       // Passwords match, user is authenticated
       return res.status(200).json({ message: 'Authentication successful', user });
     } else {
       // Passwords do not match
-      return res.status(401).json({ message: 'Authentication failed' });
+      return res.status(401).json({ message: 'Password: Authentication failed' });
     }
   } catch (error) {
     // Handle any potential errors
@@ -100,12 +96,4 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-
-
-
-//*TODO*
-//const editProfile = ...
-
-module.exports = { createUser };
-module.exports = { loginUser };
-module.exports = { forgotPassword };
+module.exports = { createUser, loginUser, forgotPassword };
