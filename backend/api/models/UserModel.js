@@ -16,7 +16,7 @@ User.init(
     lastname: DataTypes.STRING(50),
     password: DataTypes.STRING(50),
     billing_address: DataTypes.STRING(50),
-    payment_card: DataTypes.INTEGER,
+    payment_card: DataTypes.STRING(50),
     account_status: {
       type: DataTypes.ENUM('active', 'inactive'),
       defaultValue: 'active',
