@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 const createUser = async (req, res) => {
   try {
     const user = await User.create(req.body);
-    
+
     res.status(201).json({
       message: 'User created successfully',
       userId: user.user_id,
@@ -26,24 +26,28 @@ const login = async (req, res) => {
 
     if (!user) {
       // User with the provided email does not exist
-      return res.status(401).json({ message: 'Email: Authentication failed' });
+      return res.status(401).json({ message: 'User does not exist with that email' });
     }
 
     if (user.password === password) {
       // Passwords match, user is authenticated
-      console.log("true is match");
+      console.log('true is match');
     } else {
       // Passwords do not match
-      console.log("user.password:", user.password, "password:", password);
-      console.log("false not a match");
+      console.log('user.password:', user.password, 'password:', password);
+      console.log('false not a match');
     }
 
     if (user.password === password) {
       // Passwords match, user is authenticated
-      return res.status(200).json({ message: 'Authentication successful', user });
+      return res
+        .status(200)
+        .json({ message: 'Authentication successful', user });
     } else {
       // Passwords do not match
-      return res.status(401).json({ message: 'Password: Authentication failed' });
+      return res
+        .status(401)
+        .json({ message: 'Password: Authentication failed' });
     }
   } catch (error) {
     // Handle any potential errors
@@ -65,7 +69,9 @@ const forgotPassword = async (req, res) => {
     }
 
     // Generate a unique token for password reset
-    const resetToken = jwt.sign({ userId: user.user_id }, 'your-secret-key', { expiresIn: '1h' });
+    const resetToken = jwt.sign({ userId: user.user_id }, 'your-secret-key', {
+      expiresIn: '1h',
+    });
 
     // Save the reset token and expiration time to the user record
     user.resetPasswordToken = resetToken;
@@ -96,18 +102,23 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-
 const editProfile = async (req, res) => {
   try {
     // Retrieve the user's ID from the authenticated user
     const userId = req.body.user_id;
 
     // Retrieve the form data from the request
-    const { firstname, lastname, billing_address, password, payment_card, is_subscribed } = req.body;
+    const {
+      firstname,
+      lastname,
+      billing_address,
+      password,
+      payment_card,
+      is_subscribed,
+    } = req.body;
 
     // Query the database to get the current user's data using async/await syntax
     const user = await User.findByPk(userId);
-
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
