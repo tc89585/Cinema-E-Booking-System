@@ -10,13 +10,15 @@ User.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    role: DataTypes.STRING(50),
+    role: {
+      type: DataTypes.ENUM('user', 'admin'),
+      defaultValue: 'user',
+    },
     email: DataTypes.STRING(50),
     firstname: DataTypes.STRING(50),
     lastname: DataTypes.STRING(50),
     password: DataTypes.STRING(50),
     billing_address: DataTypes.STRING(50),
-    payment_card: DataTypes.STRING(50),
     account_status: {
       type: DataTypes.ENUM('active', 'inactive'),
       defaultValue: 'active',

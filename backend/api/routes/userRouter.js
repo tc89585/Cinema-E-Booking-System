@@ -1,14 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-//const { authenticateUser } = require('../middlewares/authentication');
+const authenticateUser = require('../middlewares/authentication');
 
+// User account related routes
+router.post('/', userController.createUser); //works
+router.post('/login', userController.login); //works
+router.post('/forgotpassword', userController.forgotPassword);
 
+// User profile editing routes
+router.put('/edit-profile', authenticateUser, userController.editProfile); //works
 
-router.post('/', userController.createUser);
-router.post('/login', userController.login);
-router.post('/forgotpassword',userController.forgotPassword);
-//router.put('/edit-profile', authenticateUser, userController.editProfile);
-router.put('/edit-profile', userController.editProfile);
+// User's Payment methods related routes
+router.put(
+  '/payment-methods/:payment_id',
+  authenticateUser,
+  userController.editPaymentMethod
+); //works
+router.get(
+  '/payment-methods',
+  authenticateUser,
+  userController.getPaymentMethods
+); //works
 
 module.exports = router;
