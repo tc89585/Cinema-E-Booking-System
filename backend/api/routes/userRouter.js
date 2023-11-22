@@ -12,6 +12,11 @@ router.post('/forgotpassword', userController.forgotPassword);
 router.put('/edit-profile', authenticateUser, userController.editProfile); //works
 
 // User's Payment methods related routes
+router.post(
+  '/payment-methods',
+  authenticateUser,
+  userController.createPaymentMethod
+); //works
 router.put(
   '/payment-methods/:payment_id',
   authenticateUser,

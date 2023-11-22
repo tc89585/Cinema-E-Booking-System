@@ -191,6 +191,32 @@ const getPaymentMethods = async (req, res) => {
   }
 };
 
+const createPaymentMethod = async (req, res) => {
+  try {
+    // Get the user ID from the authenticated user (stored in req.user from the middleware)
+    const userId = req.user.user_id;
+
+    // Get the payment method details from the request body
+    const { card_type, card_number, expiration_date } = req.body;
+
+    // Create a new payment method record
+    const paymentMethod = await PaymentInformation.create({
+      user_id: userId,
+      card_type,
+      card_number,
+      expiration_date,
+    });
+
+    res.status(201).json({
+      message: 'Payment method created successfully',
+      paymentMethod,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 module.exports = {
   createUser,
   login,
@@ -198,4 +224,5 @@ module.exports = {
   editProfile,
   editPaymentMethod,
   getPaymentMethods,
+  createPaymentMethod,
 };
