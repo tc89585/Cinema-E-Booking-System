@@ -30,7 +30,7 @@ function Profile() {
       if (response.ok) {
         // Profile updated successfully
         // Provide feedback to the user
-        console.log('Profile updated successfully:', userData); // You can replace this with a custom notification component
+        console.log('Profile updated successfully:'); // You can replace this with a custom notification component
       } else {
         const data = await response.json();
         // Handle errors and show error messages
