@@ -1,0 +1,133 @@
+/* Add these styles to your CSS file (e.g., EditProfile.css) */
+/* Add these styles to your CSS file (e.g., EditProfile.css) */
+
+.edit-profile-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0; /* Background color */
+  }
+  
+  .edit-profile-form {
+    background-color: #fff; /* Form background color */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    width: 400px; /* Adjust width as needed */
+    text-align: center;
+    margin: auto; /* Center the form horizontally */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center form elements vertically */
+  }
+  
+  .edit-profile-form h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #007bff; /* Header text color */
+  }
+  
+  .form-group {
+    width: 100%;
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 5px;
+  }
+  
+  .form-group label {
+    text-align: left;
+    display: flex;
+    align-items: center;
+  }
+  
+  .password-change-section {
+    width: 100%;
+    margin-top: 15px;
+  }
+  
+  /* Button styles */
+  button {
+    width: 100%;
+    background-color: #007bff; /* Button background color */
+    color: #fff; /* Button text color */
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #0056b3; /* Hover state background color */
+  }
+
+  .form-group label {
+    text-align: left;
+    display: flex;
+    align-items: center;
+  }
+  
+  .form-group label input[type="checkbox"] {
+    margin-right: 5px;
+  }
+
+
+.edit-profile-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f0f0f0; /* Add background color */
+  }
+  
+  .edit-profile-form {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 400px; /* Adjust the form width */
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  /* Add a max-width for input fields to prevent them from expanding */
+  .form-group input[type="text"],
+  .form-group input[type="password"] {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  /* Style the checkboxes */
+  .form-group label input[type="checkbox"] {
+    margin-right: 5px;
+  }
+  
+  .password-change-section {
+    display: flex;
+    flex-direction: column; /* Display password fields in a column */
+  }
+  
+  .password-change-button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  
