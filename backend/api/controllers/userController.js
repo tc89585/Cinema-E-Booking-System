@@ -6,14 +6,48 @@ const bcrypt = require('bcrypt');
 
 const createUser = async (req, res) => {
   try {
-    const { password, ...userData } = req.body;
+    const { email, password } = req.body;
+
+    // Hash the password using bcrypt
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ ...userData, password: hashedPassword });
+    const user = await User.create({ email, password: hashedPassword });
+
+    const {createTransport} = require('nodemailer');
+
+    const transporter = createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      auth: {
+        user: "cinemaebook080@gmail.com",
+        pass:
+        "xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI",
+      }
+    })
+
+
+    const emailText = `
+      Thank you for creating an account with us. We are happy that you get to be a part of the cinema-ebook family.
+    `;
+
+    const mailOptions = {
+      from: 'cinemaebook080@gmail.com',
+      to: user.email, // Use the user's email address
+      subject: 'Welcome to Cinema eBook',
+      text: emailText,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
 
     res.status(201).json({
       message: 'User created successfully',
-      user_id: user.user_id,
+      userId: user.user_id,
       email: user.email,
     });
   } catch (error) {
@@ -60,15 +94,16 @@ const login = async (req, res) => {
 };
 
 const forgotPassword = async (req, res) => {
-  const { email } = req.body;
-
   try {
-    // Find the user by their email
-    const user = await User.findOne({ email });
+    console.log('Request Body:', req.body);
+    const { email } = req.body;
 
+    // Find the user based on the provided email
+    const user = await User.findOne({ where: { email } });
+
+    // Ensure the user is found
     if (!user) {
-      // User with the provided email does not exist
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(401).json({ message: 'User does not exist with that email' });
     }
 
     // Generate a unique token for password reset
@@ -82,28 +117,51 @@ const forgotPassword = async (req, res) => {
 
     await user.save();
 
-    // Send an email with a link for password reset
-    const transporter = nodemailer.createTransport({
-      // Configure your email service here
+    // Create the reset link with the token
+    const resetLink = `http://localhost:8080/users/forgotPassword?token=${encodeURIComponent(resetToken)}`;
+
+    // Send the password reset email to the user with the reset link
+    const { createTransport } = require('nodemailer');
+    const transporter = createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      auth: {
+        user: "cinemaebook080@gmail.com",
+        pass: "xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI",
+      }
     });
 
-    const resetLink = `http://your-app-url/reset-password?token=${resetToken}`;
+    const emailText = `
+      Thank you for creating an account with us. We are happy that you get to be a part of the cinema-ebook family.
+    `;
+
     const mailOptions = {
-      from: 'your-email@example.com',
-      to: email,
-      subject: 'Password Reset Request',
+      from: 'cinemaebook080@gmail.com',
+      to: user.email,
+      subject: 'Welcome to Cinema eBook',
       text: `You can reset your password by clicking on the following link: ${resetLink}`,
     };
 
-    await transporter.sendMail(mailOptions);
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
 
-    res.status(200).json({ message: 'Password reset link sent to your email' });
+    res.status(201).json({
+      message: 'Password reset initiated successfully',
+    });
   } catch (error) {
-    // Handle any potential errors
     console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).send({ message: error.message });
   }
 };
+
+
+
+
 
 const editProfile = async (req, res) => {
   try {
