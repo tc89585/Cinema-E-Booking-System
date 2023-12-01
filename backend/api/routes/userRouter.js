@@ -16,7 +16,6 @@ router.post('/payment-methods', authenticateUser, userController.createPaymentMe
 router.put('/payment-methods/:payment_id', authenticateUser, userController.editPaymentMethod); // Edit payment method
 router.get('/payment-methods', authenticateUser, userController.getPaymentMethods); // Get payment methods
 
-
 router.get('/getUserById/:user_id', authenticateUser, userController.getUserById)
 
 module.exports = router;
