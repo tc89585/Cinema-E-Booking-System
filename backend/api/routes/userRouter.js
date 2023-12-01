@@ -4,9 +4,9 @@ const userController = require('../controllers/userController');
 const {authenticateUser} = require('../middlewares/authentication');
 
 // User account related routes
-router.post('/', userController.createUser); // Create user
-router.post('/login', userController.login); // User login
-router.post('/forgotpassword', userController.forgotPassword); // Forgot password
+router.post('/', userController.createUser); //works
+router.post('/login', userController.login); //works
+router.get('/forgotpassword', userController.forgotPassword);
 
 // User profile editing routes
 router.put('/edit-profile', authenticateUser, userController.editProfile); // Edit profile
