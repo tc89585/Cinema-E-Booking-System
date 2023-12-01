@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../../database');
+const Booking = require('./BookingModel'); // Adjust the path as necessary
 
 class User extends Model {}
 
@@ -17,7 +18,7 @@ User.init(
     email: DataTypes.STRING(50),
     firstname: DataTypes.STRING(50),
     lastname: DataTypes.STRING(50),
-    password: DataTypes.STRING(50),
+    password: DataTypes.STRING(255),
     billing_address: DataTypes.STRING(50),
     account_status: {
       type: DataTypes.ENUM('active', 'inactive'),
@@ -35,5 +36,4 @@ User.init(
     timestamps: false,
   }
 );
-
 module.exports = User;

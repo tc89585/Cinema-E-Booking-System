@@ -1,5 +1,7 @@
 const { Sequelize } = require('sequelize');
-const dotenv = require('dotenv').config();
+const dotenv = require('dotenv').config();  
+
+console.log(process.env.DB_DIALECT); // Should output 'mysql'
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
