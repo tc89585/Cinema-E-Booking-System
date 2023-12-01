@@ -16,11 +16,8 @@ Movie.init(
     director: DataTypes.STRING,
     producer: DataTypes.STRING,
     synopsis: DataTypes.STRING,
-    reviews: DataTypes.STRING,
     trailer_url: DataTypes.STRING,
     mpaa_rating: DataTypes.STRING,
-    show_date: DataTypes.DATE,
-    show_time: DataTypes.TIME,
   },
   {
     sequelize,

@@ -5,6 +5,7 @@ const cors = require('cors');
 const Movie = require('./api/models/MovieModel');
 const userRouter = require('./api/routes/userRouter');
 const movieRouter = require('./api/routes/movieRouter');
+const adminRouter = require('./api/routes/adminRouter');
 const sequelize = require('./database'); // Import the sequelize instance
 
 dotenv.config();
@@ -15,7 +16,7 @@ app.use(
     origin: 'http://localhost:3000',
   })
 );
-
+app.use('/admins', adminRouter);
 app.use('/users', userRouter);
 app.use('/movies', movieRouter);
 
