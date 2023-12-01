@@ -18,22 +18,24 @@ function Login() {
   const [forgotPassword, setForgotPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
  
   useEffect(() => {
     // Check if a token exists in local storage
     const token = localStorage.getItem("token");
-
+  
     if (token) {
       // Decode the token to get user information
       const decoded = jwtDecode(token);
-
+  
       // You can now use the user information as needed
       console.log(decoded);
-
+  
       // For example, you can set the user information in the component state
-      // setUser(decodedToken);
+      // setUser(decoded); // Make sure to set it to the correct state variable
     }
-  }, []); //
+  }, []);
+
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
@@ -60,8 +62,7 @@ function Login() {
   };
 
   const handleLogout = () => {
-    // Handle the logout logic here
-    setIsAuthenticated(false);
+    setIsLoggedIn(false);
   };
 
   const handleSubmit = async (e) => {

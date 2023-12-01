@@ -17,7 +17,6 @@ function Home() {
 
   const handleLogin = () => {
     window.location.href = 'http://localhost:3000/login';
-    setIsLoggedIn(false);
   };
 
   const handleMovieClick = (movie) => {
@@ -45,45 +44,49 @@ function Home() {
 );
 
 
-  return (
-    <div className="home">
-      <div className="banner-container">
-        <Banner
-          isLoggedIn={isLoggedIn}
-          handleLogin={handleLogin}
-          searchQuery={searchQuery}
-          handleSearch={handleSearch}
-          setIsLoggedIn={setIsLoggedIn}
-        />
-        <div className="toggle-button">
-          <button onClick={() => setShowingNow(true)}>Currently Showing</button>
-          <button onClick={() => setShowingNow(false)}>Coming Soon</button>
-        </div>
+return (
+  <div className="home">
+    <div className="banner-container">
+      <Banner
+        isLoggedIn={isLoggedIn}
+        handleLogin={handleLogin}
+        searchQuery={searchQuery}
+        handleSearch={handleSearch}
+        setIsLoggedIn={setIsLoggedIn}
+      />
+      <div className="toggle-button">
+        <button onClick={() => setShowingNow(true)}>Currently Showing</button>
+        <button onClick={() => setShowingNow(false)}>Coming Soon</button>
       </div>
-      <div className="card-list">
-        {filteredMovies.map((movie, index) => (
-          <div key={index} className="card">
-            <h2>{movie.title}</h2>
-            <iframe
-              title={movie.title}
-              src={movie.trailerUrl}
-              frameBorder="0"
-              allowFullScreen
-            ></iframe>
-            {showingNow && (
-              <button
-                className="book-button"
-                onClick={() => handleMovieClick(movie)}
-              >
-                Get Tickets
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-      {selectedMovie && <Book selectedMovie={selectedMovie} />}
     </div>
-  );
+    <div className="card-list">
+      {filteredMovies.map((movie, index) => (
+        <div key={index} className="card">
+          <h2>{movie.title}</h2>
+          <iframe
+            title={movie.title}
+            src={movie.trailer_url}
+            frameBorder="0"
+            allowFullScreen
+            width="640" // Set an explicit width
+            height="360" // Set an explicit height
+            style={{ display: "block" }} // Ensure it's set to 'block' for visibility
+          ></iframe>
+
+          {showingNow && (
+            <button
+              className="book-button"
+              onClick={() => handleMovieClick(movie)}
+            >
+              Get Tickets
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+    {selectedMovie && <Book selectedMovie={selectedMovie} />}
+  </div>
+);
 }
 
 export default Home;

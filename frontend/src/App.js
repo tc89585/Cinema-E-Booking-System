@@ -10,12 +10,13 @@ import Profile from './Components/Profile';
 import ForgotPassword from './Components/forgotpass';
 import Showtimes from './Components/Showtimes';
 import SelectSeats from './Components/SelectSeats';
-
+import { AuthProvider } from './Components/Context';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
+    <AuthProvider>
     <Router>
       <Routes>
         <Route
@@ -40,6 +41,7 @@ function App() {
         <Route path="/selectseat/" element={<SelectSeats />} />
       </Routes>
     </Router>
+    </AuthProvider>
   );
 }
 
