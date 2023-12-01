@@ -1,6 +1,5 @@
 const { Sequelize, DataTypes, Model } = require('sequelize');
-const sequelize = require('../../database'); // Adjust this path to your actual sequelize instance
-
+const sequelize = require('../../database');
 class PaymentInformation extends Model {}
 
 PaymentInformation.init(

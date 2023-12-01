@@ -216,6 +216,18 @@ const createPaymentMethod = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+const bookSeat = async (showingId, seatNumber) => {
+  try {
+    const seat = await Seat.findOne({ where: { showing_id: showingId, seat_number: seatNumber } });
+    if (!seat || seat.is_booked) {
+      throw new Error('Seat not available');
+    }
+    seat.is_booked = true;
+    await seat.save();
+  } catch (error) {
+    throw error;
+  }
+};
 
 module.exports = {
   createUser,
@@ -225,4 +237,5 @@ module.exports = {
   editPaymentMethod,
   getPaymentMethods,
   createPaymentMethod,
+  bookSeat,
 };
