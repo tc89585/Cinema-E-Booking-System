@@ -34,6 +34,7 @@ User.init(
     modelName: 'User',
     tableName: 'User',
     timestamps: false,
+    freezeTableName: true,
   }
 );
 module.exports = User;

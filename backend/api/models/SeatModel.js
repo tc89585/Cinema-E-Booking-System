@@ -3,12 +3,24 @@ const sequelize = require('../../database'); // Update with the correct path to 
 
 class Seat extends Model {}
 
-Seat.init({
-  seat_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  showroom_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Showroom', key: 'showroom_id' } },
-  seat_number: { type: DataTypes.STRING, allowNull: false }, // To store 'A1', 'B2', 'C3', etc.
-  is_booked: { type: DataTypes.BOOLEAN, defaultValue: false }
-}, 
-{ sequelize, modelName: 'Seat' });
+Seat.init(
+  {
+    seat_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    showroom_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: 'Showroom', key: 'showroom_id' },
+    },
+    seat_number: { type: DataTypes.STRING, allowNull: false }, // To store 'A1', 'B2', 'C3', etc.
+    is_booked: { type: DataTypes.BOOLEAN, defaultValue: false },
+  },
+  {
+    sequelize,
+    modelName: 'Seat',
+    tableName: 'Seat',
+    timestamps: false,
+    freezeTableName: true,
+  }
+);
 
 module.exports = Seat;
