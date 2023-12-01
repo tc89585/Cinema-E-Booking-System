@@ -8,6 +8,9 @@ import Book from './Components/Book';
 import AdminDashboard from './Components/Admin/AdminDashboard';
 import Profile from './Components/Profile';
 import ForgotPassword from './Components/forgotpass';
+import Showtimes from './Components/Showtimes';
+import SelectSeats from './Components/SelectSeats';
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -33,6 +36,8 @@ function App() {
         <Route path="/admin/*" element={<AdminDashboard />} />
         <Route path="/profile/" element={<Profile />} />
         <Route path="/forgotpassword/" element={<ForgotPassword />} />
+        <Route path="/showtime/" element={<Showtimes />} />
+        <Route path="/selectseat/" element={<SelectSeats />} />
       </Routes>
     </Router>
   );
