@@ -6,14 +6,15 @@ const Seat = require('./SeatModel');
 const Showtime = require('./ShowtimeModel');
 const Ticket = require('./TicketModel');
 const Promotion = require('./PromotionModel');
+const PaymentInformation = require('./PaymentInformationModel');
 
 // One User to Many Bookings
 User.hasMany(Booking, { foreignKey: 'user_id' });
 Booking.belongsTo(User, { foreignKey: 'user_id' });
 
 // One User to Many PaymentInformation (Assuming PaymentInformation model exists)
- User.hasMany(PaymentInformation, { foreignKey: 'user_id' });
- PaymentInformation.belongsTo(User, { foreignKey: 'user_id' });
+User.hasMany(PaymentInformation, { foreignKey: 'user_id' });
+PaymentInformation.belongsTo(User, { foreignKey: 'user_id' });
 
 // One Showroom to Many Seats
 Showroom.hasMany(Seat, { foreignKey: 'showroom_id' });
@@ -37,12 +38,12 @@ Ticket.belongsTo(Booking, { foreignKey: 'booking_id' });
 
 // Many-to-Many: Users and Promotions (through UserPromotions)
 // Assuming UserPromotions is a join table for the many-to-many relationship
-User.belongsToMany(Promotion, { through: UserPromotions });
-Promotion.belongsToMany(User, { through: UserPromotions });
+//User.belongsToMany(Promotion, { through: UserPromotions });
+//Promotion.belongsToMany(User, { through: UserPromotions });
 
 // Many-to-Many: Promotions and Movies (if you have a join table for this)
-Movie.belongsToMany(Promotion, { through: MoviePromotions });
-Promotion.belongsToMany(Movie, { through: MoviePromotions });
+//Movie.belongsToMany(Promotion, { through: MoviePromotions });
+//Promotion.belongsToMany(Movie, { through: MoviePromotions });
 
 module.exports = {
   User,
@@ -53,5 +54,4 @@ module.exports = {
   Showtime,
   Ticket,
   Promotion,
-  // Include other models here if needed
 };

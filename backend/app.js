@@ -8,6 +8,7 @@ const movieRouter = require('./api/routes/movieRouter');
 const adminRouter = require('./api/routes/adminRouter');
 const bookingRouter = require('./api/routes/bookingRouter');
 const sequelize = require('./database'); // Import the sequelize instance
+require('./api/models/Associations');
 
 dotenv.config();
 

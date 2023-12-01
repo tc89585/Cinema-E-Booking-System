@@ -7,7 +7,7 @@ PaymentInformation.init(
     payment_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     user_id: {
       type: DataTypes.INTEGER,
@@ -15,26 +15,27 @@ PaymentInformation.init(
       references: {
         model: 'User', // This should match the table name of the User model
         key: 'user_id',
-      }
+      },
     },
     card_type: {
       type: DataTypes.STRING(255),
-      allowNull: true
+      allowNull: true,
     },
     card_number: {
       type: DataTypes.STRING(255),
-      allowNull: true
+      allowNull: true,
     },
     expiration_date: {
       type: DataTypes.DATEONLY,
-      allowNull: true
-    }
+      allowNull: true,
+    },
   },
   {
     sequelize,
     modelName: 'PaymentInformation',
-    tableName: 'PaymentInformation', 
-    timestamps: false 
+    tableName: 'PaymentInformation',
+    timestamps: false,
+    freezeTableName: true,
   }
 );
 
