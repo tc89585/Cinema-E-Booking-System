@@ -302,6 +302,5 @@ module.exports = {
   editPaymentMethod,
   getPaymentMethods,
   createPaymentMethod,
-  bookSeat,
   getUserById,
 };
