@@ -32,7 +32,44 @@ const getMovieDetails = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+const getAvailableShowtimes = async (req, res) => {
+  try {
+    const movieId = parseInt(req.params.movie_id);
+    const showDate = req.params.show_date;
+
+    // Validate the date format (e.g., 'YYYY-MM-DD') and movieId
+    if (!isValidDate(showDate) || isNaN(movieId)) {
+      return res.status(400).json({ message: 'Invalid date format or movie ID' });
+    }
+
+    // Query the database to find available showtimes for a specific movie and date
+    const availableShowtimes = await Showtime.findAll({
+      where: {
+        movie_id: movieId,
+        show_date: showDate,
+      },
+      // Include additional attributes or conditions if necessary
+    });
+
+    // Respond with the available showtimes
+    if (availableShowtimes.length > 0) {
+      res.status(200).json(availableShowtimes);
+    } else {
+      res.status(404).json({ message: 'No available showtimes found' });
+    }
+  } catch (error) {
+    // Handle errors appropriately
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+// Helper function to validate date format
+function isValidDate(dateString) {
+  const regEx = /^\d{4}-\d{2}-\d{2}$/;
+  return dateString.match(regEx) != null;
+}
 
 module.exports = {
   getMovieDetails,
+  getAvailableShowtimes,
 };
