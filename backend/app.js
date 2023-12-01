@@ -6,6 +6,7 @@ const Movie = require('./api/models/MovieModel');
 const userRouter = require('./api/routes/userRouter');
 const movieRouter = require('./api/routes/movieRouter');
 const adminRouter = require('./api/routes/adminRouter');
+const bookingRouter = require('./api/routes/bookingRouter');
 const sequelize = require('./database'); // Import the sequelize instance
 
 dotenv.config();
@@ -19,6 +20,7 @@ app.use(
 app.use('/admins', adminRouter);
 app.use('/users', userRouter);
 app.use('/movies', movieRouter);
+app.use('/bookings', bookingRouter);
 
 const port = process.env.PORT || 8080;
 
