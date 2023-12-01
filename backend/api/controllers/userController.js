@@ -4,6 +4,25 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 
+
+const getUserById = async (req, res) => {
+  const user_id = req.user.user_id;
+
+  try {
+    const user = await User.findByPk(user_id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
 const createUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -296,4 +315,5 @@ module.exports = {
   getPaymentMethods,
   createPaymentMethod,
   bookSeat,
+  getUserById,
 };

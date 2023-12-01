@@ -19,4 +19,6 @@ router.get('/payment-methods', authenticateUser, userController.getPaymentMethod
 // Booking a seat for a showing
 router.post('/book-seat', authenticateUser, userController.bookSeat); // Book seat
 
+router.get('/getUserById/:user_id', authenticateUser, userController.getUserById)
+
 module.exports = router;
