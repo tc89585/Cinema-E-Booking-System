@@ -11,7 +11,7 @@ const AdminController = {
     try {
       const { password, ...adminData } = req.body;
       const hashedPassword = await bcrypt.hash(password, 10);
-      const admin = await User.create({ ...adminData, password: hashedPassword, role: 'Admin' });
+      const admin = await User.create({ ...adminData, password: hashedPassword, role: 'admin' });
       res.status(201).json({
         message: 'Admin created successfully',
         user_id: admin.UserID,
