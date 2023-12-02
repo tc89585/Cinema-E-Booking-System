@@ -4,7 +4,7 @@ const Movie = require('../models/MovieModel');
 const Showtime = require('../models/ShowtimeModel'); 
 const Promotion = require('../models/PromotionModel'); 
 const Ticket = require('../models/TicketModel'); 
-
+const Showroom = require('../models/ShowroomModel');
 const AdminController = {
   // Function to create a new admin user
   createAdmin: async (req, res) => {
@@ -111,17 +111,56 @@ const AdminController = {
   // Function to add a new showtime
   addShowtime: async (req, res) => {
     try {
-      const showtimeData = req.body;
-      const newShowtime = await Showtime.create(showtimeData);
+      // Extract the showtime data from the request
+      const { movie_id, show_date, show_time, duration } = req.body;
+  
+      // Generate a unique name for the new showroom
+      const showroomName = `Showroom-${Date.now()}`;
+  
+      // Create a new showroom
+      let newShowroom;
+      try {
+        newShowroom = await Showroom.create({
+          showroom_name: showroomName,
+          seat_rows: 5, 
+          seat_columns: 10,
+          seat_capacity: 50 
+        });
+      } catch (showroomError) {
+        console.error("Error creating new showroom: ", showroomError);
+        return res.status(500).send({ message: "Failed to create new showroom." });
+      }
+  
+      // Check if the new showroom was created successfully
+      if (!newShowroom || !newShowroom.showroom_id) {
+        console.error("Failed to create new showroom, no showroom ID returned.");
+        return res.status(500).send({ message: "Failed to create new showroom." });
+      }
+  
+      console.log("New showroom created with ID:", newShowroom.showroom_id);
+  
+      // Now create the showtime using the new showroom's ID
+      const newShowtime = await Showtime.create({
+        movie_id,
+        showroom_id: newShowroom.showroom_id,
+        show_date,
+        show_time,
+        duration
+      });
+  
+      console.log("New showtime created with ID:", newShowtime.showtime_id);
+  
       res.status(201).json({
-        message: 'Showtime added successfully',
-        showtime_id: newShowtime.ShowtimeID
+        message: 'Showtime and showroom added successfully',
+        showtime_id: newShowtime.showtime_id,
+        showroom_id: newShowroom.showroom_id
       });
     } catch (error) {
+      console.error("Error in addShowtime: ", error);
       res.status(500).send({ message: error.message });
     }
   },
-
+  
   // Function to update a showtime
   updateShowtime: async (req, res) => {
     const { showtimeId, updateData } = req.body;
