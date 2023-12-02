@@ -11,7 +11,7 @@ Promotion.init(
       autoIncrement: true,
     },
     description: { type: DataTypes.STRING },
-    discount: { type: DataTypes.DECIMAL(5, 2) },
+    discount_rate: { type: DataTypes.DECIMAL(5, 2) },
     start_date: { type: DataTypes.DATEONLY },
     end_date: { type: DataTypes.DATEONLY },
   },

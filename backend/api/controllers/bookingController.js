@@ -117,10 +117,37 @@ const getSeatsForShowtime = async (req, res) => {
       res.status(500).send({ message: error.message });
     }
   };
+  getDiscountRateByDescription = async (req, res) => {
+    try {
+      // Retrieve the description from the request parameter
+      const { description } = req.params; // Adjust based on whether you're using params or query
+  
+      // Find the promotion with the given description
+      const promotion = await Promotion.findOne({
+        where: { description }
+      });
+  
+      // Check if the promotion was found
+      if (!promotion) {
+        return res.status(404).json({ message: 'Promotion not found' });
+      }
+  
+      // Send back the description and discount rate
+      res.status(200).json({
+        description: promotion.description,
+        discountRate: promotion.discount_rate // Ensure this matches the field name in your model
+      });
+  
+    } catch (error) {
+      console.error("Error fetching promotion:", error);
+      res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+  };
 
 module.exports = {
   getMovieDetails,
   getSeatsForShowtime,
   getAvailableShowtimes,
   getTicketPrices,
+  getDiscountRateByDescription,
 };
