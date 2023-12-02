@@ -1,9 +1,9 @@
 const User = require('../models/UserModel');
 const PaymentInformation = require('../models/PaymentInformationModel');
+const Booking = require('../models/BookingModel');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
-
 
 const getUserById = async (req, res) => {
   const user_id = req.user.user_id;
@@ -22,7 +22,6 @@ const getUserById = async (req, res) => {
   }
 };
 
-
 const createUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -32,18 +31,16 @@ const createUser = async (req, res) => {
 
     const user = await User.create({ email, password: hashedPassword });
 
-    const {createTransport} = require('nodemailer');
+    const { createTransport } = require('nodemailer');
 
     const transporter = createTransport({
-      host: "smtp-relay.brevo.com",
+      host: 'smtp-relay.brevo.com',
       port: 587,
       auth: {
-        user: "cinemaebook080@gmail.com",
-        pass:
-        "xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI",
-      }
-    })
-
+        user: 'cinemaebook080@gmail.com',
+        pass: 'xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI',
+      },
+    });
 
     const emailText = `
       Thank you for creating an account with us. We are happy that you get to be a part of the cinema-ebook family.
@@ -122,7 +119,9 @@ const forgotPassword = async (req, res) => {
 
     // Ensure the user is found
     if (!user) {
-      return res.status(401).json({ message: 'User does not exist with that email' });
+      return res
+        .status(401)
+        .json({ message: 'User does not exist with that email' });
     }
 
     // Generate a unique token for password reset
@@ -137,17 +136,19 @@ const forgotPassword = async (req, res) => {
     await user.save();
 
     // Create the reset link with the token
-    const resetLink = `http://localhost:8080/users/forgotPassword?token=${encodeURIComponent(resetToken)}`;
+    const resetLink = `http://localhost:8080/users/forgotPassword?token=${encodeURIComponent(
+      resetToken
+    )}`;
 
     // Send the password reset email to the user with the reset link
     const { createTransport } = require('nodemailer');
     const transporter = createTransport({
-      host: "smtp-relay.brevo.com",
+      host: 'smtp-relay.brevo.com',
       port: 587,
       auth: {
-        user: "cinemaebook080@gmail.com",
-        pass: "xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI",
-      }
+        user: 'cinemaebook080@gmail.com',
+        pass: 'xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI',
+      },
     });
 
     const emailText = `
@@ -177,10 +178,6 @@ const forgotPassword = async (req, res) => {
     res.status(500).send({ message: error.message });
   }
 };
-
-
-
-
 
 const editProfile = async (req, res) => {
   try {
@@ -294,6 +291,27 @@ const createPaymentMethod = async (req, res) => {
   }
 };
 
+const getBookingHistory = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+
+    // Fetching the booking history for the given user
+    const bookingHistory = await Booking.findAll({
+      where: {
+        user_id: userId,
+      },
+      order: [['booking_date', 'DESC']], // Optional: Order by booking date, newest first
+    });
+
+    // Sending the booking history as a response
+    res.json(bookingHistory);
+  } catch (error) {
+    // Handle any errors
+    console.error('Error fetching booking history:', error);
+    res.status(500).send('Error fetching booking history');
+  }
+};
+
 module.exports = {
   createUser,
   login,
@@ -303,4 +321,5 @@ module.exports = {
   getPaymentMethods,
   createPaymentMethod,
   getUserById,
+  getBookingHistory,
 };

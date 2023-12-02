@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const {authenticateUser} = require('../middlewares/authentication');
+const { authenticateUser } = require('../middlewares/authentication');
 
 // User account related routes
 router.post('/', userController.createUser); //works
@@ -12,10 +12,32 @@ router.get('/forgotpassword', userController.forgotPassword);
 router.put('/edit-profile', authenticateUser, userController.editProfile); // Edit profile
 
 // User's Payment methods related routes
-router.post('/payment-methods', authenticateUser, userController.createPaymentMethod); // Create payment method
-router.put('/payment-methods/:payment_id', authenticateUser, userController.editPaymentMethod); // Edit payment method
-router.get('/payment-methods', authenticateUser, userController.getPaymentMethods); // Get payment methods
+router.post(
+  '/payment-methods',
+  authenticateUser,
+  userController.createPaymentMethod
+); // Create payment method
+router.put(
+  '/payment-methods/:payment_id',
+  authenticateUser,
+  userController.editPaymentMethod
+); // Edit payment method
+router.get(
+  '/payment-methods',
+  authenticateUser,
+  userController.getPaymentMethods
+); // Get payment methods
 
-router.get('/getUserById/:user_id', authenticateUser, userController.getUserById)
+router.get(
+  '/getUserById/:user_id',
+  authenticateUser,
+  userController.getUserById
+);
+
+router.get(
+  '/getBookingHistory',
+  authenticateUser,
+  userController.getBookingHistory
+);
 
 module.exports = router;
