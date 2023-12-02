@@ -5,6 +5,7 @@ const Showtime = require('../models/ShowtimeModel');
 const Promotion = require('../models/PromotionModel'); 
 const Ticket = require('../models/TicketModel'); 
 const Showroom = require('../models/ShowroomModel');
+const TicketPrice = require('../models/TicketPriceModel');
 const AdminController = {
   // Function to create a new admin user
   createAdmin: async (req, res) => {
@@ -70,23 +71,27 @@ const AdminController = {
 
   // Function to edit ticket prices
   editTicketPrice: async (req, res) => {
-    const { ticketTypeId, newPrice } = req.body;
-    
     try {
-      const ticketType = await Ticket.findByPk(ticketTypeId);
-      
-      if (!ticketType) {
-        return res.status(404).send({ message: 'Ticket type not found' });
-      }
+      const { ticket_type, ticket_price } = req.body;
+      const updated = await TicketPrice.update({ ticket_price }, {
+        where: { ticket_type }
+      });
   
-      // Update the ticket type's price
-      ticketType.price = newPrice;
-      
-      // Save the updated ticket type
-      await ticketType.save();
-      
-      // Respond with success message
-      res.status(200).json({ message: 'Ticket price updated successfully for future buyers' });
+      if (updated[0] > 0) {
+        res.status(200).send({ message: 'Ticket price updated successfully.' });
+      } else {
+        res.status(404).send({ message: 'Ticket type not found.' });
+      }
+    } catch (error) {
+      res.status(500).send({ message: error.message });
+    }
+  },
+
+  // Function to get ticket prices
+  getTicketPrices: async (req, res) => {
+    try {
+      const prices = await TicketPrice.findAll();
+      res.status(200).json(prices);
     } catch (error) {
       res.status(500).send({ message: error.message });
     }
