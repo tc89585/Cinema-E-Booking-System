@@ -33,4 +33,7 @@ router.put('/updateShowtime', adminAuthMiddleware, adminController.updateShowtim
 // Route to delete a showtime
 router.delete('/deleteShowtime/:showtimeId', adminAuthMiddleware, adminController.deleteShowtime);
 
+// Route to get all promotions
+router.get('/getPromotions',adminAuthMiddleware,adminController.getPromotions);
+
 module.exports = router;

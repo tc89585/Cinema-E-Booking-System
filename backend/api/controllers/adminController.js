@@ -190,7 +190,16 @@ const AdminController = {
     }
   },
 
-
+  // Function to get all promotions
+  getPromotions: async (req, res) => {
+    try {
+        const promotions = await Promotion.findAll();
+        res.status(200).json(promotions);
+    } catch (error) {
+        console.error("Error fetching promotions:", error);
+        res.status(500).send({ message: "Failed to retrieve promotions" });
+    }
+  },
 };
 
 module.exports = AdminController;

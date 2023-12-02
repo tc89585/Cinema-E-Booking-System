@@ -8,4 +8,6 @@ router.get('/getMovieDetails', bookingController.getMovieDetails);
 router.get('/getSeatsForShowtime/:showtime_id',bookingController.getSeatsForShowtime);
 router.get('/getAvailableShowtimes/:movie_id/:show_date', bookingController.getAvailableShowtimes);
 router.get('/getTicketPrice', bookingController.getTicketPrices);
+router.get('/getDiscountRateByDescription/:description', bookingController.getDiscountRateByDescription);
+
 module.exports = router;
