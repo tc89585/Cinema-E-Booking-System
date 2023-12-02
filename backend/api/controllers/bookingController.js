@@ -9,7 +9,9 @@ const Ticket = require('../models/TicketModel'); // Import your database connect
 const Seat = require('../models/SeatModel');
 const PaymentInfo = require('../models/PaymentInformationModel');
 const Showroom = require('../models/ShowroomModel');
-const TicketPrice = require('../models/TicketPriceModel');
+const Booking = require('../models/BookingModel');
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 const getMovieDetails = async (req, res) => {
   const { movie_id } = req.body;
@@ -144,10 +146,160 @@ const getSeatsForShowtime = async (req, res) => {
     }
   };
 
+
+
+
+const createBooking = async (req, res) => {
+  try {
+    const { user_id, showtime_id, booking_date, total_price, seatsAndTickets } = req.body;
+
+    // Step 1: Create a new booking
+    const newBooking = await Booking.create({
+      user_id,
+      showtime_id,
+      booking_date,
+      total_price,
+    });
+
+    // Extract the booking_id
+    const booking_id = newBooking.booking_id;
+
+    // Step 2: Create tickets and update seats
+    for (const { seat_id, ticket_type } of seatsAndTickets) {
+      // Step 2a: Create a new ticket
+      await Ticket.create({
+        booking_id,
+        seat_id,
+        ticket_type,
+      });
+
+      // Step 2b: Update the corresponding seat to mark it as booked
+      if (seat_id) {
+        await Seat.update(
+          { is_booked: true },
+          {
+            where: {
+              seat_id: seat_id,
+            },
+          }
+        );
+      } else {
+        console.error('Seat ID is undefined for ticket:', { seat_id, ticket_type });
+        // Handle the error or log it as needed
+      }
+    }
+
+    // Step 3: Retrieve individual showtime and seat information
+const bookingDetails = await Booking.findByPk(booking_id);
+
+if (!bookingDetails) {
+  return res.status(404).json({ error: 'Booking not found' });
+}
+
+const showtimeDetails = await Showtime.findByPk(showtime_id);
+
+if (!showtimeDetails) {
+  return res.status(404).json({ error: 'Showtime not found' });
+}
+
+// Step 4: Retrieve seat numbers for the booked seats
+const seatNumbers = [];
+
+for (const seatInfo of seatsAndTickets) {
+  const seatDetails = await Seat.findByPk(seatInfo.seat_id, {
+    attributes: ['seat_number'],
+  });
+
+  if (seatDetails) {
+    seatNumbers.push(seatDetails.seat_number);
+  }
+}
+
+// Step 5: Send confirmation email
+const emailContent = `Thank you for booking with us. Here is information regarding your booking:\n
+  Total Price: ${bookingDetails.total_price}\n
+  Booking Date: ${bookingDetails.booking_date}\n
+  Show Date: ${showtimeDetails.show_date}\n
+  Show Time: ${showtimeDetails.show_time}\n
+  Seats: ${seatNumbers.join(', ')}\n
+  Thank you! Please respond with any questions.`;
+
+    // Send the email using your preferred email sending mechanism
+
+    const {createTransport} = require('nodemailer');
+
+    const transporter = createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      auth: {
+        user: "cinemaebook080@gmail.com",
+        pass:
+        "xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI",
+      }
+    })
+
+
+    //Get user email
+
+    const getUserEmailById = async () => {
+      try {
+        // Find the user by user_id
+        const user = await User.findByPk(user_id);
+    
+        if (!user) {
+          console.error('User not found');
+          return null; // or throw an error, depending on your needs
+        }
+        console.log("found user: ", user);
+    
+        // Extract and return the email
+        const userEmail = user.email;
+        return userEmail;
+      } catch (error) {
+        console.error('Error fetching user email:', error);
+        throw error; // or handle the error appropriately
+      }
+    };
+
+
+
+    const mailOptions = {
+      from: 'cinemaebook080@gmail.com',
+      to: await getUserEmailById(), // Use the user's email address
+      subject: 'Welcome to Cinema eBook',
+      text: emailContent,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+
+
+    // Send a success response if needed
+    res.status(200).json({ message: 'Booking created successfully', booking_id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+
+
+
+
+
+
+
 module.exports = {
   getMovieDetails,
   getSeatsForShowtime,
   getAvailableShowtimes,
   getTicketPrices,
   getDiscountRateByDescription,
+  createBooking,
 };
