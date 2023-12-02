@@ -9,6 +9,7 @@ const Ticket = require('../models/TicketModel'); // Import your database connect
 const Seat = require('../models/SeatModel');
 const PaymentInfo = require('../models/PaymentInformationModel');
 const Showroom = require('../models/ShowroomModel');
+const TicketPrice = require('../models/TicketPriceModel');
 
 const getMovieDetails = async (req, res) => {
   const { movie_id } = req.body;
@@ -107,9 +108,19 @@ const getSeatsForShowtime = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+  // Function to get ticket prices
+  const getTicketPrices = async (req, res) => {
+    try {
+      const prices = await TicketPrice.findAll();
+      res.status(200).json(prices);
+    } catch (error) {
+      res.status(500).send({ message: error.message });
+    }
+  };
 
 module.exports = {
   getMovieDetails,
   getSeatsForShowtime,
   getAvailableShowtimes,
+  getTicketPrices,
 };

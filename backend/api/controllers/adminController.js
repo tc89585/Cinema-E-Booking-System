@@ -87,16 +87,6 @@ const AdminController = {
     }
   },
 
-  // Function to get ticket prices
-  getTicketPrices: async (req, res) => {
-    try {
-      const prices = await TicketPrice.findAll();
-      res.status(200).json(prices);
-    } catch (error) {
-      res.status(500).send({ message: error.message });
-    }
-  },
-
   // Function to add or update promotions
   updatePromotion: async (req, res) => {
     const { promotionId, updateData } = req.body;
