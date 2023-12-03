@@ -200,6 +200,39 @@ const AdminController = {
         res.status(500).send({ message: "Failed to retrieve promotions" });
     }
   },
+    // Function to suspend or activate a user account by email and status
+    manageUser: async (req, res) => {
+      const { email, status } = req.params;
+  
+      try {
+        // Check if the user exists by email
+        const user = await User.findOne({
+          where: {
+            email: email,
+          },
+        });
+  
+        if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+  
+        // Update the user's account status
+        if (status === 'active') {
+          user.account_status = 'active';
+        } else if (status === 'inactive') {
+          user.account_status = 'inactive';
+        } else {
+          return res.status(400).json({ message: 'Invalid status provided' });
+        }
+  
+        await user.save();
+  
+        res.status(200).json({ message: `User account ${user.account_status}` });
+      } catch (error) {
+        res.status(500).json({ message: 'Error managing user account', error: error.message });
+      }
+    },
 };
+
 
 module.exports = AdminController;
