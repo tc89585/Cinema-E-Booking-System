@@ -1,40 +1,24 @@
-import React, { useState, useEffect } from "react";
-import "./Login.css";
-import { jwtDecode } from "jwt-decode";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import './Login.css';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from './Context.js'; // Ensure this path is correct
 
-const API_URL = "http://localhost:8080";
+const API_URL = 'http://localhost:8080';
+
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [isRegistered, setIsRegistered] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [role, setRole] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
+  const [role, setRole] = useState('');
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [forgotPassword, setForgotPassword] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
- 
-  useEffect(() => {
-    // Check if a token exists in local storage
-    const token = localStorage.getItem("token");
-  
-    if (token) {
-      // Decode the token to get user information
-      const decoded = jwtDecode(token);
-  
-      // You can now use the user information as needed
-      console.log(decoded);
-  
-      // For example, you can set the user information in the component state
-      // setUser(decoded); // Make sure to set it to the correct state variable
-    }
-  }, []);
+
+  const { setToken } = useAuth(); // Use the setToken function from AuthContext
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -51,18 +35,11 @@ function Login() {
   const handlePromotionsChange = (e) => {
     setIsSubscribed(e.target.checked);
   };
-  const handleForgotPasswordChange = (e) => {
-    setForgotPassword(e.target.value);
-  };
+
   const handleFormToggle = () => {
     setIsLogin(!isLogin);
-    setErrorMessage("");
+    setErrorMessage('');
     setIsRegistered(false);
-    // Clear form fields here if needed
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
   };
 
   const handleSubmit = async (e) => {
@@ -70,87 +47,74 @@ function Login() {
     if (isLogin) {
       try {
         const response = await fetch(`${API_URL}/users/login`, {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({ email, password }),
         });
-        
+
         if (response.status === 200) {
-          // Successful login
           const userData = await response.json();
-          console.log("Login successful!");
-  
-          // Store the token in local storage
+          console.log('Login successful!');
           localStorage.setItem('token', userData.token);
-  
-          // Redirect to the homepage
-          navigate("/"); // Use the correct route path for the homepage
+          setToken(userData.token); // Update the token in AuthContext
+          navigate('/'); // Redirect to the homepage or dashboard
         } else {
           setErrorMessage(
-            "Authentication failed. Please check your email and password."
+            'Authentication failed. Please check your email and password.'
           );
         }
       } catch (error) {
-        console.error("Error:", error);
-        setErrorMessage("An error occurred. Please try again later.");
+        console.error('Error:', error);
+        setErrorMessage('An error occurred. Please try again later.');
       }
     } else {
-      // Form validation
-      setIsAuthenticated(false);
-  
       if (!email || !password || !passwordConfirm) {
-        setErrorMessage("Please fill in all mandatory fields.");
+        setErrorMessage('Please fill in all mandatory fields.');
       } else if (password !== passwordConfirm) {
-        setErrorMessage("Password and confirm password must match.");
+        setErrorMessage('Password and confirm password must match.');
       } else {
-        // Registration data
         const registrationData = {
           role,
           email,
           password,
           is_subscribed: isSubscribed,
+          firstname,
+          lastname,
         };
-        if (!isLogin) {
-          registrationData.firstname = firstname;
-          registrationData.lastname = lastname;
-        }
         try {
           const response = await fetch(`${API_URL}/users`, {
-            method: "POST",
+            method: 'POST',
             headers: {
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify(registrationData),
           });
-  
+
           if (response.ok) {
-            // Registration successful
             setIsRegistered(true);
-            setErrorMessage("");
-            // Clear form fields or navigate to a confirmation page
+            setErrorMessage('');
           } else {
             const errorData = await response.json();
             setErrorMessage(errorData.message);
           }
         } catch (error) {
-          console.error("Error:", error);
-          setErrorMessage("An error occurred. Please try again later.");
+          console.error('Error:', error);
+          setErrorMessage('An error occurred. Please try again later.');
         }
       }
     }
   };
-  
 
   return (
     <div className="login-container">
       <div
         className={`login-form ${
-          isLogin ? "login-form-login" : "login-form-signup"
+          isLogin ? 'login-form-login' : 'login-form-signup'
         }`}
       >
-        <h2>{isLogin ? "Login" : "Sign Up"}</h2>
+        <h2>{isLogin ? 'Login' : 'Sign Up'}</h2>
         <form onSubmit={handleSubmit}>
           {!isLogin && (
             <div className="form-group">
@@ -214,28 +178,26 @@ function Login() {
               />
             </div>
           )}
-
           {!isLogin && (
             <div className="form-group">
-              <label style={{ display: "flex", alignItems: "center" }}>
+              <label style={{ display: 'flex', alignItems: 'center' }}>
                 <input
                   type="checkbox"
                   checked={isSubscribed}
                   onChange={handlePromotionsChange}
-                  style={{ marginRight: "5px" }}
+                  style={{ marginRight: '5px' }}
                 />
                 Subscribe to Promotions
               </label>
             </div>
           )}
-
           {isLogin && (
-            <Link to="/forgotpassword" style={{ margin: "10px 0" }}>
+            <Link to="/forgotpassword" style={{ margin: '10px 0' }}>
               Forgot Password?
             </Link>
           )}
           <button type="submit" className="login-button">
-            {isLogin ? "Login" : "Sign Up"}
+            {isLogin ? 'Login' : 'Sign Up'}
           </button>
         </form>
         {errorMessage && <div className="error-message">{errorMessage}</div>}
@@ -245,9 +207,9 @@ function Login() {
           </div>
         )}
         <p>
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
+          {isLogin ? "Don't have an account? " : 'Already have an account? '}
           <span className="toggle-link" onClick={handleFormToggle}>
-            {isLogin ? "Sign Up" : "Login"}
+            {isLogin ? 'Sign Up' : 'Login'}
           </span>
         </p>
       </div>

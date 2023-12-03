@@ -11,36 +11,33 @@ import ForgotPassword from './Components/forgotpass';
 import Showtimes from './Components/Showtimes';
 import SelectSeats from './Components/SelectSeats';
 import { AuthProvider } from './Components/Context';
+import { ProtectedRoute } from './Components/ProtectedRoute';
+import { ErrorPage } from './Components/ErrorPage';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
   return (
     <AuthProvider>
-    <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={<Home isAuthenticated={isAuthenticated} />}
-        />
-        <Route
-          path="/login"
-          element={
-            <Login
-              isAuthenticated={isAuthenticated}
-              setIsAuthenticated={setIsAuthenticated}
-            />
-          }
-        />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/book" element={<Book />} />
-        <Route path="/admin/*" element={<AdminDashboard />} />
-        <Route path="/profile/" element={<Profile />} />
-        <Route path="/forgotpassword/" element={<ForgotPassword />} />
-        <Route path="/showtime/" element={<Showtimes />} />
-        <Route path="/selectseat/" element={<SelectSeats />} />
-      </Routes>
-    </Router>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/book" element={<Book />} />
+          <Route path="/admin/*" element={<AdminDashboard />} />
+          <Route
+            path="/profile/"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/forgotpassword/" element={<ForgotPassword />} />
+          <Route path="/showtime/" element={<Showtimes />} />
+          <Route path="/selectseat/" element={<SelectSeats />} />
+          <Route path="*" element={<ErrorPage />} />
+        </Routes>
+      </Router>
     </AuthProvider>
   );
 }
