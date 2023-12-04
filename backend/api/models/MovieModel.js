@@ -19,6 +19,11 @@ Movie.init(
     trailer_url: DataTypes.STRING,
     mpaa_rating: DataTypes.STRING,
     Poster_url: DataTypes.STRING,
+    isCurrentlyShowing: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     sequelize,
