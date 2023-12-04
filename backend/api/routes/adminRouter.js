@@ -37,6 +37,12 @@ router.delete('/deleteShowtime/:showtimeId', adminAuthMiddleware, adminControlle
 router.get('/getPromotions',adminAuthMiddleware,adminController.getPromotions);
 
 // Route to suspend a user by email
-router.put('/manageUser/:email/:status', adminAuthMiddleware, adminController.manageUser);
+router.patch('/manageUser/:email/:account_status',adminAuthMiddleware, adminController.manageUser);
+
+// Route to get all users
+router.get('/getAllUsers',adminAuthMiddleware, adminController.getAllUsers);
+
+// Route to add movie
+router.post('/addMovie',adminAuthMiddleware, adminController.addMovie);
 
 module.exports = router;

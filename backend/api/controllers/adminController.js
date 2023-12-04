@@ -6,6 +6,10 @@ const Promotion = require('../models/PromotionModel');
 const Ticket = require('../models/TicketModel'); 
 const Showroom = require('../models/ShowroomModel');
 const TicketPrice = require('../models/TicketPriceModel');
+const { createTransport } = require('nodemailer');
+const Sequelize = require('sequelize');
+const Seat = require("../models/SeatModel");
+
 const AdminController = {
   // Function to create a new admin user
   createAdmin: async (req, res) => {
@@ -27,7 +31,43 @@ const AdminController = {
   createPromotion: async (req, res) => {
     try {
       const promotionData = req.body;
+  
+      // Create promotion in the database
       const promotion = await Promotion.create(promotionData);
+  
+      // Get all active users
+      const users = await User.findAll({
+        where: {
+          account_status: 'active',
+        },
+      });
+  
+      // Extract email addresses from users
+      const emailAddresses = users.map(user => user.email);
+  
+      // Send email to each user
+      const transporter = createTransport({
+        host: 'smtp-relay.brevo.com',
+        port: 587,
+        auth: {
+          user: 'cinemaebook080@gmail.com',
+          pass: 'xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI',
+        },
+      });
+  
+      for (const email of emailAddresses) {
+        const emailText = `Dear user, we have a new promotion for you: ${promotion.description}`;
+  
+        const mailOptions = {
+          from: 'cinemaebook080@gmail.com',
+          to: email,
+          subject: 'New Promotion Alert',
+          text: emailText,
+        };
+  
+        await transporter.sendMail(mailOptions);
+      }
+  
       res.status(201).json({
         message: 'Promotion created successfully',
         promotion_id: promotion.PromotionID,
@@ -109,6 +149,21 @@ const AdminController = {
       // Extract the showtime data from the request
       const { movie_id, show_date, show_time, duration } = req.body;
   
+      // Check if a showtime for this movie at the same date and time already exists
+      const existingShowtime = await Showtime.findOne({
+        where: {
+          movie_id: movie_id,
+          show_date: show_date,
+          show_time: show_time
+        }
+      });
+  
+      // If an existing showtime is found, send an error response
+      if (existingShowtime) {
+        console.error("Showtime for this movie at the specified date and time already exists.");
+        return res.status(400).send({ message: "Showtime already exists for this movie at the specified date and time." });
+      }
+  
       // Generate a unique name for the new showroom
       const showroomName = `Showroom-${Date.now()}`;
   
@@ -117,9 +172,9 @@ const AdminController = {
       try {
         newShowroom = await Showroom.create({
           showroom_name: showroomName,
-          seat_rows: 5, 
+          seat_rows: 5,
           seat_columns: 10,
-          seat_capacity: 50 
+          seat_capacity: 50
         });
       } catch (showroomError) {
         console.error("Error creating new showroom: ", showroomError);
@@ -133,6 +188,19 @@ const AdminController = {
       }
   
       console.log("New showroom created with ID:", newShowroom.showroom_id);
+  
+      // Create 50 seats in a 5x10 arrangement for the new showroom
+      const rows = ['A', 'B', 'C', 'D', 'E'];
+      const columns = 10;
+      for (let row of rows) {
+        for (let col = 1; col <= columns; col++) {
+          await Seat.create({
+            showroom_id: newShowroom.showroom_id,
+            seat_number: `${row}${col}`,
+            is_booked: false
+          });
+        }
+      }
   
       // Now create the showtime using the new showroom's ID
       const newShowtime = await Showtime.create({
@@ -156,6 +224,7 @@ const AdminController = {
     }
   },
   
+
   // Function to update a showtime
   updateShowtime: async (req, res) => {
     const { showtimeId, updateData } = req.body;
@@ -164,6 +233,26 @@ const AdminController = {
       if (!showtime) {
         return res.status(404).send({ message: 'Showtime not found' });
       }
+  
+      // Check if the updateData has date and time information to update
+      if (updateData.show_date || updateData.show_time) {
+        // Check if a showtime for this movie at the same date and time already exists
+        const conflictingShowtime = await Showtime.findOne({
+          where: {
+            movie_id: showtime.movie_id,
+            show_date: updateData.show_date || showtime.show_date,
+            show_time: updateData.show_time || showtime.show_time,
+            showtime_id: { [Sequelize.Op.ne]: showtimeId } // Exclude the current showtime
+          }
+        });
+  
+        // If a conflicting showtime is found, send an error response
+        if (conflictingShowtime) {
+          return res.status(400).send({ message: 'Another showtime already exists at the specified date and time.' });
+        }
+      }
+  
+      // No conflicts found, proceed with update
       Object.assign(showtime, updateData);
       await showtime.save();
       res.status(200).json({
@@ -202,36 +291,79 @@ const AdminController = {
   },
     // Function to suspend or activate a user account by email and status
     manageUser: async (req, res) => {
-      const { email, status } = req.params;
-  
+      const { email, account_status } = req.params;
+    
+      // Basic validation for email and status
+      if (!email || !account_status) {
+        return res.status(400).json({ message: 'Email and status are required' });
+      }
+    
+      if (!['active', 'inactive'].includes(account_status)) {
+        return res.status(400).json({ message: 'Invalid status provided' });
+      }
+    
       try {
         // Check if the user exists by email
         const user = await User.findOne({
-          where: {
-            email: email,
-          },
+          where: { email: email },
         });
-  
+    
         if (!user) {
           return res.status(404).json({ message: 'User not found' });
         }
-  
+    
         // Update the user's account status
-        if (status === 'active') {
-          user.account_status = 'active';
-        } else if (status === 'inactive') {
-          user.account_status = 'inactive';
-        } else {
-          return res.status(400).json({ message: 'Invalid status provided' });
-        }
-  
+        user.account_status = account_status;
         await user.save();
-  
-        res.status(200).json({ message: `User account ${user.account_status}` });
+    
+        res.status(200).json({ message: `User account status updated to ${user.account_status}` });
       } catch (error) {
         res.status(500).json({ message: 'Error managing user account', error: error.message });
       }
     },
+    
+
+    // Function to display all users and their email and account status
+    getAllUsers: async (req, res) => {
+      try {
+          const users = await User.findAll({
+              attributes: ['email', 'account_status']
+          });
+          res.status(200).json(users);
+      } catch (error) {
+          console.error('Error fetching users:', error);
+          res.status(500).send({ message: 'Error fetching user data' });
+      }
+  },
+    addMovie: async (req, res) => {
+      try {
+          const { title, category, director, producer, synopsis, mpaa_rating, cast, Poster_url, trailer_url} = req.body;
+
+          // Validate input
+          if (!title || !category || !director || !producer || !synopsis|| !mpaa_rating || !cast || !Poster_url || !trailer_url ) {
+              return res.status(400).send({ message: "All fields are required" });
+          }
+
+          // Create a new movie record
+          const newMovie = await Movie.create({
+            title,
+            category,
+            director,
+            producer,
+            synopsis,
+            mpaa_rating,
+            cast,
+            Poster_url,
+            trailer_url
+          });
+
+          // Send a success response
+          res.status(201).send({ message: "Movie added successfully", movie: newMovie });
+      } catch (error) {
+          console.error("Error adding movie:", error);
+          res.status(500).send({ message: "Error adding new movie" });
+      }
+  }
 };
 
 

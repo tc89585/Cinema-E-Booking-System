@@ -18,7 +18,7 @@ Movie.init(
     synopsis: DataTypes.STRING,
     trailer_url: DataTypes.STRING,
     mpaa_rating: DataTypes.STRING,
-    poster_url: DataTypes.STRING,
+    Poster_url: DataTypes.STRING,
   },
   {
     sequelize,
