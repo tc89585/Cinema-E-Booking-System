@@ -6,6 +6,7 @@ const Promotion = require('../models/PromotionModel');
 const Ticket = require('../models/TicketModel'); 
 const Showroom = require('../models/ShowroomModel');
 const TicketPrice = require('../models/TicketPriceModel');
+const { createTransport } = require('nodemailer');
 const Sequelize = require('sequelize');
 const Seat = require("../models/SeatModel");
 
@@ -30,7 +31,43 @@ const AdminController = {
   createPromotion: async (req, res) => {
     try {
       const promotionData = req.body;
+  
+      // Create promotion in the database
       const promotion = await Promotion.create(promotionData);
+  
+      // Get all active users
+      const users = await User.findAll({
+        where: {
+          account_status: 'active',
+        },
+      });
+  
+      // Extract email addresses from users
+      const emailAddresses = users.map(user => user.email);
+  
+      // Send email to each user
+      const transporter = createTransport({
+        host: 'smtp-relay.brevo.com',
+        port: 587,
+        auth: {
+          user: 'cinemaebook080@gmail.com',
+          pass: 'xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI',
+        },
+      });
+  
+      for (const email of emailAddresses) {
+        const emailText = `Dear user, we have a new promotion for you: ${promotion.description}`;
+  
+        const mailOptions = {
+          from: 'cinemaebook080@gmail.com',
+          to: email,
+          subject: 'New Promotion Alert',
+          text: emailText,
+        };
+  
+        await transporter.sendMail(mailOptions);
+      }
+  
       res.status(201).json({
         message: 'Promotion created successfully',
         promotion_id: promotion.PromotionID,
