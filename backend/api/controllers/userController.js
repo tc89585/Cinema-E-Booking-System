@@ -84,6 +84,10 @@ const login = async (req, res) => {
         .json({ message: 'User does not exist with that email' });
     }
 
+    if (user.account_status !== 'active') {
+      return res.status(401).json({ message: 'User account is inactive' });
+    }
+
     const plainTextPassword = password;
     const hashedPassword = user.password;
 
