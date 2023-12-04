@@ -30,6 +30,7 @@ const handleMovieClick = (movie) => {
       .then((response) => {
         // Handle the response data by setting it to the state
         setMovies(response.data);
+        
       })
       .catch((error) => {
         console.error('Error fetching movies:', error);

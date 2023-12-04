@@ -8,7 +8,6 @@ import Book from './Components/Book';
 import AdminDashboard from './Components/Admin/AdminDashboard';
 import Profile from './Components/Profile';
 import ForgotPassword from './Components/forgotpass';
-import Showtimes from './Components/Showtimes';
 import SelectSeats from './Components/SelectSeats';
 import { AuthProvider } from './Components/Context';
 import { ProtectedRoute } from './Components/ProtectedRoute';
@@ -33,8 +32,7 @@ function App() {
             }
           />
           <Route path="/forgotpassword/" element={<ForgotPassword />} />
-          <Route path="/showtime/" element={<Showtimes />} />
-          <Route path="/selectseat/" element={<SelectSeats />} />
+          <Route path="/selectseat/:showtimeId" element={<SelectSeats />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </Router>
