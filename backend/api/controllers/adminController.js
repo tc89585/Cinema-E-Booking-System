@@ -7,6 +7,8 @@ const Ticket = require('../models/TicketModel');
 const Showroom = require('../models/ShowroomModel');
 const TicketPrice = require('../models/TicketPriceModel');
 const Sequelize = require('sequelize');
+const Seat = require("../models/SeatModel");
+
 const AdminController = {
   // Function to create a new admin user
   createAdmin: async (req, res) => {
@@ -118,38 +120,51 @@ const AdminController = {
           show_time: show_time
         }
       });
-
+  
       // If an existing showtime is found, send an error response
       if (existingShowtime) {
         console.error("Showtime for this movie at the specified date and time already exists.");
         return res.status(400).send({ message: "Showtime already exists for this movie at the specified date and time." });
       }
-
+  
       // Generate a unique name for the new showroom
       const showroomName = `Showroom-${Date.now()}`;
-
+  
       // Create a new showroom
       let newShowroom;
       try {
         newShowroom = await Showroom.create({
           showroom_name: showroomName,
-          seat_rows: 5, 
+          seat_rows: 5,
           seat_columns: 10,
-          seat_capacity: 50 
+          seat_capacity: 50
         });
       } catch (showroomError) {
         console.error("Error creating new showroom: ", showroomError);
         return res.status(500).send({ message: "Failed to create new showroom." });
       }
-
+  
       // Check if the new showroom was created successfully
       if (!newShowroom || !newShowroom.showroom_id) {
         console.error("Failed to create new showroom, no showroom ID returned.");
         return res.status(500).send({ message: "Failed to create new showroom." });
       }
-
+  
       console.log("New showroom created with ID:", newShowroom.showroom_id);
-
+  
+      // Create 50 seats in a 5x10 arrangement for the new showroom
+      const rows = ['A', 'B', 'C', 'D', 'E'];
+      const columns = 10;
+      for (let row of rows) {
+        for (let col = 1; col <= columns; col++) {
+          await Seat.create({
+            showroom_id: newShowroom.showroom_id,
+            seat_number: `${row}${col}`,
+            is_booked: false
+          });
+        }
+      }
+  
       // Now create the showtime using the new showroom's ID
       const newShowtime = await Showtime.create({
         movie_id,
@@ -158,9 +173,9 @@ const AdminController = {
         show_time,
         duration
       });
-
+  
       console.log("New showtime created with ID:", newShowtime.showtime_id);
-
+  
       res.status(201).json({
         message: 'Showtime and showroom added successfully',
         showtime_id: newShowtime.showtime_id,
@@ -171,6 +186,7 @@ const AdminController = {
       res.status(500).send({ message: error.message });
     }
   },
+  
 
   // Function to update a showtime
   updateShowtime: async (req, res) => {
