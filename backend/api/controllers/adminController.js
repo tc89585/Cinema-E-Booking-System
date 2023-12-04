@@ -363,7 +363,31 @@ const AdminController = {
           console.error("Error adding movie:", error);
           res.status(500).send({ message: "Error adding new movie" });
       }
-  }
+  },
+  deletePromotion: async (req, res) => {
+    try {
+        const { promotion_id } = req.params;
+
+        // Delete the promotion with the given ID
+        const result = await Promotion.destroy({
+            where: {
+                promotion_id: promotion_id
+            }
+        });
+
+        if (result === 0) {
+            // No promotion found with the given ID
+            return res.status(404).json({ message: 'Promotion not found' });
+        }
+
+        // Respond back that the deletion was successful
+        res.status(200).json({ message: 'Promotion deleted successfully' });
+    } catch (error) {
+        // Handle any errors that occur during the process
+        res.status(500).send({ message: error.message });
+        console.error('Error deleting promotion:', error);
+    }
+}
 };
 
 

@@ -45,4 +45,7 @@ router.get('/getAllUsers',adminAuthMiddleware, adminController.getAllUsers);
 // Route to add movie
 router.post('/addMovie',adminAuthMiddleware, adminController.addMovie);
 
+// Route to delete promotion
+router.delete('/deletePromotion/:promotion_id', adminAuthMiddleware, adminController.deletePromotion);
+
 module.exports = router;
