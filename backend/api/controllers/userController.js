@@ -216,73 +216,30 @@ const login = async (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     console.log('Request Body:', req.body);
-    const { email } = req.body;
+    const { email, password } = req.body;
 
     // Find the user based on the provided email
     const user = await User.findOne({ where: { email } });
 
-    // Ensure the user is found
-    if (!user) {
-      return res
-        .status(401)
-        .json({ message: 'User does not exist with that email' });
+    // Step 2: Update the user's password in the database
+    if (user) {
+      const saltRounds = 10; // Adjust the number of salt rounds based on your security requirements
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      user.password = hashedPassword;
+      await user.save();
+
+      // You can return a success message or any other indication if needed
+      return res.status(200).json({ success: true, message: 'Password updated successfully' });
+    } else {
+      // Handle case where user with the given email is not found
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
-
-    // Generate a unique token for password reset
-    const resetToken = jwt.sign({ userId: user.user_id }, 'your-secret-key', {
-      expiresIn: '1h',
-    });
-
-    // Save the reset token and expiration time to the user record
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-
-    await user.save();
-
-    // Create the reset link with the token
-    const resetLink = `http://localhost:8080/users/forgotPassword?token=${encodeURIComponent(
-      resetToken
-    )}`;
-
-    // Send the password reset email to the user with the reset link
-    const { createTransport } = require('nodemailer');
-    const transporter = createTransport({
-      host: 'smtp-relay.brevo.com',
-      port: 587,
-      auth: {
-        user: 'cinemaebook080@gmail.com',
-        pass: 'xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI',
-      },
-    });
-
-    const emailText = `
-      Thank you for creating an account with us. We are happy that you get to be a part of the cinema-ebook family.
-    `;
-
-    const mailOptions = {
-      from: 'cinemaebook080@gmail.com',
-      to: user.email,
-      subject: 'Welcome to Cinema eBook',
-      text: `You can reset your password by clicking on the following link: ${resetLink}`,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending email:', error);
-      } else {
-        console.log('Email sent:', info.response);
-      }
-    });
-
-    res.status(201).json({
-      message: 'Password reset initiated successfully',
-    });
   } catch (error) {
-    console.error(error);
-    res.status(500).send({ message: error.message });
+    // Handle any errors that may occur during the process
+    console.error('Error in forgotPassword:', error);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };
-
 const editProfile = async (req, res) => {
   try {
     const userId = req.user.user_id;
