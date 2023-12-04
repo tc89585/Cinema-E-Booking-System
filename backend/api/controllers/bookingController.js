@@ -12,6 +12,7 @@ const Showroom = require('../models/ShowroomModel');
 const Booking = require('../models/BookingModel');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const TicketPrice = require('../models/TicketPriceModel')
 
 const getMovieDetails = async (req, res) => {
   const { movie_id } = req.body;
