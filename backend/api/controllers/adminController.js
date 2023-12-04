@@ -232,6 +232,35 @@ const AdminController = {
         res.status(500).json({ message: 'Error managing user account', error: error.message });
       }
     },
+    addMovie: async (req, res) => {
+      try {
+          const { title, category, director, producer, synopsis, mpaa_rating, cast, Poster_url, trailer_url} = req.body;
+
+          // Validate input
+          if (!title || !category || !director || !producer || !synopsis|| !mpaa_rating || !cast || !Poster_url || !trailer_url ) {
+              return res.status(400).send({ message: "All fields are required" });
+          }
+
+          // Create a new movie record
+          const newMovie = await Movie.create({
+            title,
+            category,
+            director,
+            producer,
+            synopsis,
+            mpaa_rating,
+            cast,
+            Poster_url,
+            trailer_url
+          });
+
+          // Send a success response
+          res.status(201).send({ message: "Movie added successfully", movie: newMovie });
+      } catch (error) {
+          console.error("Error adding movie:", error);
+          res.status(500).send({ message: "Error adding new movie" });
+      }
+  }
 };
 
 
