@@ -53,7 +53,7 @@ const Book = () => {
       {movie && (
         <>
           <img
-            src={movie.poster_url}
+            src={movie.Poster_url}
             alt={movie.title}
             style={{ maxHeight: '400px', width: 'auto', marginBottom: '20px' }}
           />

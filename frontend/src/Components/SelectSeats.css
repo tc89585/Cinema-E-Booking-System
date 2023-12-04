@@ -1,14 +1,16 @@
 .seat-selection-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* Center the grid horizontally */
+  align-items: center; /* Center the grid vertically */
+  height: 100vh; /* Set the container height to full viewport height */
 }
 
 .seat-selector {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
   gap: 10px;
   align-items: center;
-  justify-content: start;
+  justify-content: center; /* Center the grid items horizontally */
 }
 
 .selection-summary {
@@ -32,6 +34,8 @@
 }
 
 .seat {
+  flex: 1 0 calc(10% - 10px); /* Adjust the width as needed */
+  aspect-ratio: 1/1; /* Maintain square aspect ratio */
   margin: 5px;
   padding: 10px;
   border: 1px solid #ccc;
