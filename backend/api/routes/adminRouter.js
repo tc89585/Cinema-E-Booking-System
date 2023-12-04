@@ -42,4 +42,7 @@ router.patch('/manageUser/:email/:account_status',adminAuthMiddleware, adminCont
 // Route to get all users
 router.get('/getAllUsers', adminController.getAllUsers);
 
+// Route to add movie
+router.post('/addMovie',adminAuthMiddleware, adminController.addMovie);
+
 module.exports = router;
