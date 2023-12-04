@@ -7,7 +7,7 @@ const Ticket = require('../models/TicketModel');
 const Showroom = require('../models/ShowroomModel');
 const TicketPrice = require('../models/TicketPriceModel');
 const { createTransport } = require('nodemailer');
-
+const Sequelize = require('sequelize');
 const AdminController = {
   // Function to create a new admin user
   createAdmin: async (req, res) => {
@@ -147,9 +147,24 @@ const AdminController = {
       // Extract the showtime data from the request
       const { movie_id, show_date, show_time, duration } = req.body;
   
+      // Check if a showtime for this movie at the same date and time already exists
+      const existingShowtime = await Showtime.findOne({
+        where: {
+          movie_id: movie_id,
+          show_date: show_date,
+          show_time: show_time
+        }
+      });
+
+      // If an existing showtime is found, send an error response
+      if (existingShowtime) {
+        console.error("Showtime for this movie at the specified date and time already exists.");
+        return res.status(400).send({ message: "Showtime already exists for this movie at the specified date and time." });
+      }
+
       // Generate a unique name for the new showroom
       const showroomName = `Showroom-${Date.now()}`;
-  
+
       // Create a new showroom
       let newShowroom;
       try {
@@ -163,15 +178,15 @@ const AdminController = {
         console.error("Error creating new showroom: ", showroomError);
         return res.status(500).send({ message: "Failed to create new showroom." });
       }
-  
+
       // Check if the new showroom was created successfully
       if (!newShowroom || !newShowroom.showroom_id) {
         console.error("Failed to create new showroom, no showroom ID returned.");
         return res.status(500).send({ message: "Failed to create new showroom." });
       }
-  
+
       console.log("New showroom created with ID:", newShowroom.showroom_id);
-  
+
       // Now create the showtime using the new showroom's ID
       const newShowtime = await Showtime.create({
         movie_id,
@@ -180,9 +195,9 @@ const AdminController = {
         show_time,
         duration
       });
-  
+
       console.log("New showtime created with ID:", newShowtime.showtime_id);
-  
+
       res.status(201).json({
         message: 'Showtime and showroom added successfully',
         showtime_id: newShowtime.showtime_id,
@@ -193,7 +208,7 @@ const AdminController = {
       res.status(500).send({ message: error.message });
     }
   },
-  
+
   // Function to update a showtime
   updateShowtime: async (req, res) => {
     const { showtimeId, updateData } = req.body;
@@ -202,6 +217,26 @@ const AdminController = {
       if (!showtime) {
         return res.status(404).send({ message: 'Showtime not found' });
       }
+  
+      // Check if the updateData has date and time information to update
+      if (updateData.show_date || updateData.show_time) {
+        // Check if a showtime for this movie at the same date and time already exists
+        const conflictingShowtime = await Showtime.findOne({
+          where: {
+            movie_id: showtime.movie_id,
+            show_date: updateData.show_date || showtime.show_date,
+            show_time: updateData.show_time || showtime.show_time,
+            showtime_id: { [Sequelize.Op.ne]: showtimeId } // Exclude the current showtime
+          }
+        });
+  
+        // If a conflicting showtime is found, send an error response
+        if (conflictingShowtime) {
+          return res.status(400).send({ message: 'Another showtime already exists at the specified date and time.' });
+        }
+      }
+  
+      // No conflicts found, proceed with update
       Object.assign(showtime, updateData);
       await showtime.save();
       res.status(200).json({
