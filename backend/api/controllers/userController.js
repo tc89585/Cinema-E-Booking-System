@@ -111,26 +111,35 @@ const checkCode = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, firstname, lastname, billing_address, role, account_status, is_subscribed } = req.body;
 
     // Hash the password using bcrypt
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ email, password: hashedPassword });
+    // Create the user with all provided fields
+    const user = await User.create({ 
+      email, 
+      password: hashedPassword,
+      firstname,
+      lastname,
+      billing_address,
+      role,
+      account_status,
+      is_subscribed
+    });
 
-    const { createTransport } = require('nodemailer');
-
+    // Set up nodemailer transporter
     const transporter = createTransport({
       host: 'smtp-relay.brevo.com',
       port: 587,
       auth: {
         user: 'cinemaebook080@gmail.com',
-        pass: 'xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI',
+        pass: 'yourSMTPpassword', // Use your actual SMTP password
       },
     });
 
     const emailText = `
-      Thank you for creating an account with us. We are happy that you get to be a part of the cinema-ebook family.
+      Thank you for creating an account with us, ${firstname}. We are happy that you get to be a part of the cinema-ebook family.
     `;
 
     const mailOptions = {
@@ -140,6 +149,7 @@ const createUser = async (req, res) => {
       text: emailText,
     };
 
+    // Send the welcome email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Error sending email:', error);
@@ -148,6 +158,7 @@ const createUser = async (req, res) => {
       }
     });
 
+    // Respond with the created user information
     res.status(201).json({
       message: 'User created successfully',
       userId: user.user_id,
@@ -158,6 +169,8 @@ const createUser = async (req, res) => {
     console.error(error);
   }
 };
+
+module.exports = createUser;
 
 const login = async (req, res) => {
   const { email, password } = req.body;
