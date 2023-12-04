@@ -202,36 +202,50 @@ const AdminController = {
   },
     // Function to suspend or activate a user account by email and status
     manageUser: async (req, res) => {
-      const { email, status } = req.params;
-  
+      const { email, account_status } = req.params;
+    
+      // Basic validation for email and status
+      if (!email || !account_status) {
+        return res.status(400).json({ message: 'Email and status are required' });
+      }
+    
+      if (!['active', 'inactive'].includes(account_status)) {
+        return res.status(400).json({ message: 'Invalid status provided' });
+      }
+    
       try {
         // Check if the user exists by email
         const user = await User.findOne({
-          where: {
-            email: email,
-          },
+          where: { email: email },
         });
-  
+    
         if (!user) {
           return res.status(404).json({ message: 'User not found' });
         }
-  
+    
         // Update the user's account status
-        if (status === 'active') {
-          user.account_status = 'active';
-        } else if (status === 'inactive') {
-          user.account_status = 'inactive';
-        } else {
-          return res.status(400).json({ message: 'Invalid status provided' });
-        }
-  
+        user.account_status = account_status;
         await user.save();
-  
-        res.status(200).json({ message: `User account ${user.account_status}` });
+    
+        res.status(200).json({ message: `User account status updated to ${user.account_status}` });
       } catch (error) {
         res.status(500).json({ message: 'Error managing user account', error: error.message });
       }
     },
+    
+
+    // Function to display all users and their email and account status
+    getAllUsers: async (req, res) => {
+      try {
+          const users = await User.findAll({
+              attributes: ['email', 'account_status']
+          });
+          res.status(200).json(users);
+      } catch (error) {
+          console.error('Error fetching users:', error);
+          res.status(500).send({ message: 'Error fetching user data' });
+      }
+  },
 };
 
 
