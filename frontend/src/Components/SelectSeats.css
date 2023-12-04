@@ -1,63 +1,71 @@
 .seat-selection-container {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .seat-selector {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .selection-summary {
-    background: #333;
-    color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: left;
-  }
-  
-  .selection-buttons {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 10px;
-  }
-  
-  .row {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
-  }
-  
-  .seat {
-    margin: 5px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #fff;
-    cursor: pointer;
-  }
-  
-  .seat.selected {
-    background-color: #f0ad4e;
-    color: white;
-  }
-  
-  button.confirm {
-    background-color: #d9534f;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin-right: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button.cancel {
-    background-color: #5cb85c;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+  display: flex;
+  justify-content: space-between;
+}
+
+.seat-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: start;
+}
+
+.selection-summary {
+  background: #333;
+  color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.selection-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.seat {
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.seat.selected {
+  background-color: #f0ad4e;
+  color: white;
+}
+
+.seat.booked {
+  background-color: #d9534f;
+  color: white;
+  cursor: not-allowed;
+}
+
+button.confirm {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-right: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button.cancel {
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}

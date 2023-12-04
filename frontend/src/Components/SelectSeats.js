@@ -1,15 +1,28 @@
-import React, { useState } from 'react';
-import './SelectSeats.css'; // Make sure to create a corresponding CSS file for styling
+import React, { useState, useEffect } from 'react';
+import './SelectSeats.css';
+import Axios from 'axios';
+import { useParams } from 'react-router-dom';
+
 
 const SelectSeats = () => {
-  // Represents the rows and seats in each row
-  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-  const seatsPerRow = 14;
-
-  // State to track selected seats
+  const { showtimeId } = useParams(); // Retrieve showtimeId from URL params
+  const [seats, setSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState(new Set());
 
-  // Function to handle seat selection
+  useEffect(() => {
+    const fetchSeats = async () => {
+      try {
+        const response = await Axios.get(`http://localhost:8080/bookings/getSeatsForShowtime/${showtimeId}`);
+        setSeats(response.data);
+        console.log(seats);
+      } catch (error) {
+        console.error('Error fetching seats:', error);
+      }
+    };
+
+    fetchSeats();
+  }, [showtimeId]);
+
   const toggleSeatSelection = (seatId) => {
     const newSelection = new Set(selectedSeats);
     if (newSelection.has(seatId)) {
@@ -20,36 +33,46 @@ const SelectSeats = () => {
     setSelectedSeats(newSelection);
   };
 
-  // Function to handle confirmation of seat selection
   const confirmSelection = () => {
-    // Handle the logic to confirm the seat selection here
     console.log('Confirmed seats:', Array.from(selectedSeats));
+    // Implement logic to proceed with the booking or any other action
   };
 
-  // Function to handle cancellation of seat selection
   const cancelSelection = () => {
-    setSelectedSeats(new Set()); // Clears the selection
+    setSelectedSeats(new Set());
   };
 
-  // Function to generate seat elements
+  const isSeatBooked = (seatId) => {
+    return seats.find((seat) => seat.seat_id === seatId && seat.is_booked);
+  };
+
   const generateSeats = () => {
-    return rows.map((row) => (
-      <div key={row} className="row">
-        {[...Array(seatsPerRow).keys()].map((seat) => {
-          const seatId = `${row}${seat + 1}`;
+    return (
+      <div className="seat-selector">
+        {seats.map((seat) => {
+          const seatId = seat.seat_id;
+          const isBooked = seat.is_booked;
+          const isSeatSelected = selectedSeats.has(seatId);
+          const seatClassName = `seat ${isSeatSelected ? 'selected' : ''} ${isBooked ? 'booked' : ''}`;
+  
           return (
             <button
               key={seatId}
-              className={`seat ${selectedSeats.has(seatId) ? 'selected' : ''}`}
-              onClick={() => toggleSeatSelection(seatId)}
+              className={seatClassName}
+              onClick={() => !isBooked && toggleSeatSelection(seatId)}
+              disabled={isBooked}
             >
-              {seatId}
+              {seat.seat_number}
             </button>
           );
         })}
       </div>
-    ));
+    );
   };
+  
+  
+  
+
 
   return (
     <div className="seat-selection-container">
@@ -60,7 +83,7 @@ const SelectSeats = () => {
           <p>Seats: {Array.from(selectedSeats).join(', ')}</p>
         </div>
         <div className="selection-buttons">
-          <button className="confirm" onClick={confirmSelection}>Confirm</button>
+          <button className="confirm" onClick={confirmSelection} disabled={selectedSeats.size === 0}>Confirm</button>
           <button className="cancel" onClick={cancelSelection}>Cancel</button>
         </div>
       </div>
