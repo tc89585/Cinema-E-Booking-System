@@ -3,6 +3,7 @@ import Axios from 'axios';
 import './home.css';
 import Book from './Book';
 import Banner from './Banner';
+import { useNavigate } from "react-router-dom";;
 
 function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -10,16 +11,18 @@ function Home() {
   const [showingNow, setShowingNow] = useState(true);
   const [movies, setMovies] = useState([]);
 
+  const navigate = useNavigate();
+
+
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  const handleMovieClick = (movie) => {
-    setSelectedMovie(movie);
-    if (showingNow) {
-      // Handle the navigation to the booking page or any other action you want.
-    }
-  };
+  
+const handleMovieClick = (movie) => {
+  setSelectedMovie(movie);
+  navigate(`/book/${movie.movie_id}`); // Navigate to the booking page with movie ID
+};
 
   useEffect(() => {
     // Make a GET request to fetch movies from your backend
@@ -49,31 +52,35 @@ function Home() {
           <button onClick={() => setShowingNow(false)}>Coming Soon</button>
         </div>
       </div>
-      <div className="card-list">
-        {filteredMovies.map((movie, index) => (
-          <div key={index} className="card">
-            <h2>{movie.title}</h2>
-            <iframe
-              title={movie.title}
-              src={movie.trailer_url}
-              frameBorder="0"
-              allowFullScreen
-              width="640" // Set an explicit width
-              height="360" // Set an explicit height
-              style={{ display: 'block' }} // Ensure it's set to 'block' for visibility
-            ></iframe>
+<div className="card-list">
+  {filteredMovies.map((movie, index) => (
+    <div key={index} className="card">
+      {/* Make the title clickable */}
+      <h2 onClick={() => handleMovieClick(movie)} style={{ cursor: 'pointer' }}>
+        {movie.title}
+      </h2>
+      <iframe
+        title={movie.title}
+        src={movie.trailer_url}
+        frameBorder="0"
+        allowFullScreen
+        width="640"
+        height="360"
+        style={{ display: 'block' }}
+      ></iframe>
 
-            {showingNow && (
-              <button
-                className="book-button"
-                onClick={() => handleMovieClick(movie)}
-              >
-                Get Tickets
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+      {showingNow && (
+        <button
+          className="book-button"
+          onClick={() => handleMovieClick(movie)}
+        >
+          Get Tickets
+        </button>
+      )}
+    </div>
+  ))}
+</div>
+
       {selectedMovie && <Book selectedMovie={selectedMovie} />}
     </div>
   );

@@ -1,47 +1,46 @@
-import React from 'react';
-import './book.css'
+import React, { useState, useEffect } from 'react';
+import './book.css';
+import Axios from 'axios';
+import { useParams } from 'react-router-dom';
+
 const Book = () => {
-  const movieData = [
-    {
-      title: 'Oppenheimer',
-      posterUrl: 'https://m.media-amazon.com/images/I/71xDtUSyAKL._AC_UF894,1000_QL80_.jpg',
-      description:
-        "During World War II, Lt. Gen. Leslie Groves Jr. appoints physicist J. Robert Oppenheimer to work on the top-secret Manhattan Project...",
-      isCurrentlyShowing: true,
-      timeSlots: [
-        { id: 1, startTime: '10:00 AM' },
-        { id: 2, startTime: '1:00 PM' },
-        { id: 3, startTime: '4:00 PM' },
-      ],
-    },
-  ];
+  const [movie, setMovie] = useState(null); // Initialize as null or an empty object
+  const { movieId } = useParams();
 
-  const selectedMovie = movieData[0]; // Select a movie from movieData
+  useEffect(() => {
+    Axios.get(`http://localhost:8080/movies/getMovieById/${movieId}`)
+      .then((response) => {
+        setMovie(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching movie:', error);
+      });
+  }, [movieId]);
 
-  if (!selectedMovie) {
-    return <div>Please select a movie.</div>;
+  if (!movie) {
+    return <div>Loading...</div>;
   }
 
   return (
     <div className='book-container'>
       <h1>Movie Booking</h1>
-      <img src={selectedMovie.posterUrl} alt={selectedMovie.title} />
+      <img src={movie.poster_url} alt={movie.title} />
 
-      <h2>{selectedMovie.title}</h2>
-      <p>{selectedMovie.description}</p>
+      <h2>{movie.title}</h2>
+      <p>{movie.description}</p>
 
       <h3>Showtimes:</h3>
       <ul>
-        {selectedMovie.timeSlots.map((timeSlot) => (
+        {movie.timeSlots && movie.timeSlots.map((timeSlot) => (
           <li key={timeSlot.id}>{timeSlot.startTime}</li>
         ))}
       </ul>
       <button className="booking-button" type="button">
-    Book Now
-  </button>
-</div>
-   
+        Book Now
+      </button>
+    </div>
   );
 };
 
 export default Book;
+

@@ -20,9 +20,9 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/book/:movieId" element={<Book />} />
           <Route path="/login" element={<Login />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/book" element={<Book />} />
           <Route path="/admin/*" element={<AdminDashboard />} />
           <Route
             path="/profile/"
