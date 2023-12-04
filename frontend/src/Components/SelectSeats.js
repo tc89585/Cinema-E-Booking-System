@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './SelectSeats.css';
 import Axios from 'axios';
-import { useParams } from 'react-router-dom';
-
+import { useParams, useNavigate } from 'react-router-dom';
 
 const SelectSeats = () => {
-  const { showtimeId } = useParams(); // Retrieve showtimeId from URL params
+  const { showtimeId } = useParams();
   const [seats, setSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState(new Set());
 
@@ -14,7 +13,6 @@ const SelectSeats = () => {
       try {
         const response = await Axios.get(`http://localhost:8080/bookings/getSeatsForShowtime/${showtimeId}`);
         setSeats(response.data);
-        console.log(seats);
       } catch (error) {
         console.error('Error fetching seats:', error);
       }
@@ -33,10 +31,7 @@ const SelectSeats = () => {
     setSelectedSeats(newSelection);
   };
 
-  const confirmSelection = () => {
-    console.log('Confirmed seats:', Array.from(selectedSeats));
-    // Implement logic to proceed with the booking or any other action
-  };
+  const confirmSelection = () => {};
 
   const cancelSelection = () => {
     setSelectedSeats(new Set());
@@ -47,41 +42,45 @@ const SelectSeats = () => {
   };
 
   const generateSeats = () => {
-  return seats.map((seat) => {
-    const seatId = seat.seat_id;
-    const isBooked = seat.is_booked;
-    const isSeatSelected = selectedSeats.has(seatId);
-    const seatClassName = `seat ${isSeatSelected ? 'selected' : ''} ${isBooked ? 'booked' : ''}`;
-
     return (
-      <button
-        key={seatId}
-        className={seatClassName}
-        onClick={() => !isBooked && toggleSeatSelection(seatId)}
-        disabled={isBooked}
-      >
-        {seat.seat_number}
-      </button>
+      <div className="seat-selector">
+        {seats.map((seat) => {
+          const seatId = seat.seat_id;
+          const isBooked = seat.is_booked;
+          const isSeatSelected = selectedSeats.has(seatId);
+          const seatClassName = `seat ${isSeatSelected ? 'selected' : ''} ${isBooked ? 'booked' : ''}`;
+
+          return (
+            <button
+              key={seatId}
+              className={seatClassName}
+              onClick={() => !isBooked && toggleSeatSelection(seatId)}
+              disabled={isBooked}
+            >
+              {seat.seat_number}
+            </button>
+          );
+        })}
+      </div>
     );
-  });
-};
-
-  
-  
-  
-
+  };
 
   return (
     <div className="seat-selection-container">
-      <div className="seat-selector">{generateSeats()}</div>
+      <div className="theater-screen"></div>
+      {generateSeats()}
       <div className="selection-summary">
         <div>
           <h3>{selectedSeats.size} Seats Selected:</h3>
           <p>Seats: {Array.from(selectedSeats).join(', ')}</p>
         </div>
         <div className="selection-buttons">
-          <button className="confirm" onClick={confirmSelection} disabled={selectedSeats.size === 0}>Confirm</button>
-          <button className="cancel" onClick={cancelSelection}>Cancel</button>
+          <button className="confirm" onClick={confirmSelection} disabled={selectedSeats.size === 0}>
+            Confirm
+          </button>
+          <button className="cancel" onClick={cancelSelection}>
+            Cancel
+          </button>
         </div>
       </div>
     </div>
