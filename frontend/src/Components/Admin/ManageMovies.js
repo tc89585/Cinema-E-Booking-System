@@ -1,136 +1,95 @@
-// import React, { useState } from 'react';
-// import './ManageMovies.css';
-
-// function ManageMovies() {
-//   const [movieData, setMovieData] = useState({
-//     title: '',
-//     description: '',
-//     cast: '',
-//     director: '',
-//     rating: '',
-//     genre: '',
-//     trailerUrl: '',
-//     trailerImage: '',
-//     startDate: '',
-//     endDate: '',
-//     comingSoon: false,
-//   });
-//   const [message, setMessage] = useState('');
-
-//   const handleInputChange = (e) => {
-//     const { name, value, type, checked } = e.target;
-//     const newValue = type === 'checkbox' ? checked : value;
-//     setMovieData({ ...movieData, [name]: newValue });
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     // Add your logic here to save movie data to your backend or state.
-//     // For this example, we'll just display a success message.
-//     setMessage('Movie added successfully');
-//   };
-
-//   return (
-//     <div className="manage-movies-container">
-//       <h2>Add a Movie</h2>
-//       <form onSubmit={handleSubmit} className="movie-form">
-//         <div className="form-group">
-//           <label>Title:</label>
-//           <input type="text" name="title" value={movieData.title} onChange={handleInputChange} required />
-//         </div>
-//         <div className="form-group">
-//           <label>Description:</label>
-//           <textarea name="description" value={movieData.description} onChange={handleInputChange} required />
-//         </div>
-//         <div className="form-group">
-//           <label>Cast:</label>
-//           <input type="text" name="cast" value={movieData.cast} onChange={handleInputChange} required />
-//         </div>
-//         <div className="form-group">
-//           <label>Director:</label>
-//           <input type="text" name="director" value={movieData.director} onChange={handleInputChange} required />
-//         </div>
-//         <div className="form-group">
-//           <label>Rating:</label>
-//           <input type="text" name="rating" value={movieData.rating} onChange={handleInputChange} required />
-//         </div>
-//         <div className="form-group">
-//           <label>Genre:</label>
-//           <input type="text" name="genre" value={movieData.genre} onChange={handleInputChange} required />
-//         </div>
-//         <div className="form-group">
-//           <label>Trailer URL:</label>
-//           <input type="text" name="trailerUrl" value={movieData.trailerUrl} onChange={handleInputChange} required />
-//         </div>
-//         <div className="form-group">
-//           <label>Trailer Image:</label>
-//           <input type="text" name="trailerImage" value={movieData.trailerImage} onChange={handleInputChange} required />
-//         </div>
-//         <div className="form-group">
-//           <label>Start Date:</label>
-//           <input type="date" name="startDate" value={movieData.startDate} onChange={handleInputChange} required />
-//         </div>
-//         <div className="form-group">
-//           <label>End Date:</label>
-//           <input type="date" name="endDate" value={movieData.endDate} onChange={handleInputChange} required />
-//         </div>
-//         <div className="form-group">
-//           <label>
-//             <input
-//               type="checkbox"
-//               name="comingSoon"
-//               checked={movieData.comingSoon}
-//               onChange={handleInputChange}
-//             />
-//             Coming Soon
-//           </label>
-//         </div>
-//         <button type="submit" className="submit-button">
-//           Submit Movie
-//         </button>
-//       </form>
-//       {message && <p className="success-message">{message}</p>}
-//     </div>
-//   );
-// }
-
-// export default ManageMovies;
-
-import React, { useState } from 'react';
-import '../Styles/ManageMovies.css';
+import React, { useState } from "react";
+import "../Styles/ManageMovies.css";
+import { useAuth } from "../Context";
 
 function ManageMovies() {
   const [movieData, setMovieData] = useState({
-    title: '',
-    description: '',
-    cast: '',
-    director: '',
-    rating: '',
-    genre: '',
-    trailerUrl: '',
-    trailerImage: '',
-    startDate: '',
-    endDate: '',
-    comingSoon: false,
+    title: "",
+    synopsis: "",
+    cast: "",
+    director: "",
+    producer: "",
+    category: "", 
+    trailer_url: "",
+    Poster_url: "", 
+    mpaa_rating: "",
+});
+  const [showtimeData, setShowtimeData] = useState({
+    movie_id: "",
+    show_date: "",
+    show_time: "",
+    duration: "",
   });
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [showAddMovieForm, setShowAddMovieForm] = useState(false);
+  const API_URL =
+    process.env.REACT_APP_API_URL || "http://localhost:8080/admins";
+  const { token } = useAuth();
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    const newValue = type === 'checkbox' ? checked : value;
-    setMovieData({ ...movieData, [name]: newValue });
+    const newValue = type === "checkbox" ? checked : value;
+
+    if (name in movieData) {
+      setMovieData({ ...movieData, [name]: newValue });
+    } else if (name in showtimeData) {
+      setShowtimeData({ ...showtimeData, [name]: newValue });
+    }
   };
 
   const handleAddMovieClick = () => {
     setShowAddMovieForm(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your logic here to save movie data to your backend or state.
-    // For this example, we'll just display a success message.
-    setMessage('Movie added successfully');
+
+    try {
+      const response = await fetch(`${API_URL}/addMovie`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(movieData),
+      });
+      console.log({movie:movieData});
+
+      if (response.ok) {
+        const data = await response.json();
+        setMessage(data.message || "Movie added successfully");
+      } else {
+        throw new Error("Failed to add movie");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setMessage(error.message);
+    }
+  };
+
+  const handleShowtimeSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${API_URL}/addShowtime`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(showtimeData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Handle success
+      } else {
+        throw new Error("Failed to add showtime");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle error
+    }
   };
 
   return (
@@ -143,43 +102,114 @@ function ManageMovies() {
         <form onSubmit={handleSubmit} className="movie-form">
           <div className="form-group">
             <label>Title:</label>
-            <input type="text" name="title" value={movieData.title} onChange={handleInputChange} required />
+            <input
+              type="text"
+              name="title"
+              value={movieData.title}
+              onChange={handleInputChange}
+              required
+            />
           </div>
           <div className="form-group">
             <label>Description:</label>
-            <textarea name="description" value={movieData.description} onChange={handleInputChange} required />
+            <textarea
+              name="synopsis"
+              value={movieData.synopsis}
+              onChange={handleInputChange}
+              required
+            />
           </div>
           <div className="form-group">
             <label>Cast:</label>
-            <input type="text" name="cast" value={movieData.cast} onChange={handleInputChange} required />
+            <input
+              type="text"
+              name="cast"
+              value={movieData.cast}
+              onChange={handleInputChange}
+              required
+            />
           </div>
           <div className="form-group">
             <label>Director:</label>
-            <input type="text" name="director" value={movieData.director} onChange={handleInputChange} required />
+            <input
+              type="text"
+              name="director"
+              value={movieData.director}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Producer:</label>
+            <input
+              type="text"
+              name="producer"
+              value={movieData.producer}
+              onChange={handleInputChange}
+              required
+            />
           </div>
           <div className="form-group">
             <label>Rating:</label>
-            <input type="text" name="rating" value={movieData.rating} onChange={handleInputChange} required />
+            <input
+              type="text"
+              name="mpaa_rating"
+              value={movieData.mpaa_rating}
+              onChange={handleInputChange}
+              required
+            />
           </div>
           <div className="form-group">
             <label>Genre:</label>
-            <input type="text" name="genre" value={movieData.genre} onChange={handleInputChange} required />
+            <input
+              type="text"
+              name="category"
+              value={movieData.category}
+              onChange={handleInputChange}
+              required
+            />
           </div>
           <div className="form-group">
             <label>Trailer URL:</label>
-            <input type="text" name="trailerUrl" value={movieData.trailerUrl} onChange={handleInputChange} required />
+            <input
+              type="url"
+              name="trailer_url"
+              value={movieData.trailer_url}
+              onChange={handleInputChange}
+              src={movieData.trailer_url}
+              required
+            />
           </div>
           <div className="form-group">
-            <label>Trailer Image:</label>
-            <input type="text" name="trailerImage" value={movieData.trailerImage} onChange={handleInputChange} required />
+            <label>Poster:</label>
+            <input
+              type="url"
+              name="Poster_url"
+              value={movieData.Poster_url}
+              onChange={handleInputChange}
+              src={movieData.poster_url}
+              required
+            />
           </div>
           <div className="form-group">
-            <label>Start Date:</label>
-            <input type="date" name="startDate" value={movieData.startDate} onChange={handleInputChange} required />
+            <label>ShowDate:</label>
+            <input
+              type="date"
+              name="show_date"
+              value={showtimeData.show_date}
+              onChange={handleInputChange}
+              required
+            />
           </div>
           <div className="form-group">
-            <label>End Date:</label>
-            <input type="date" name="endDate" value={movieData.endDate} onChange={handleInputChange} required />
+            <label>Show Time:</label>
+            <input
+              type="time"
+              name="show_time"
+              value={showtimeData.show_time}
+              onChange={handleInputChange}
+              required
+            />
           </div>
           <div className="form-group">
             <label>
