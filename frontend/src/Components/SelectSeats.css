@@ -1,8 +1,8 @@
 .seat-selection-container {
   display: flex;
-  justify-content: center; /* Center the grid horizontally */
-  align-items: center; /* Center the grid vertically */
-  height: 100vh; /* Set the container height to full viewport height */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 .seat-selector {
@@ -10,12 +10,12 @@
   grid-template-columns: repeat(10, 1fr);
   gap: 10px;
   align-items: center;
-  justify-content: center; /* Center the grid items horizontally */
+  justify-content: center;
 }
 
 .selection-summary {
-  background: #333;
-  color: #fff;
+  background: #282c34;
+  color: #61dafb;
   padding: 20px;
   border-radius: 10px;
   text-align: left;
@@ -34,42 +34,43 @@
 }
 
 .seat {
-  flex: 1 0 calc(10% - 10px); /* Adjust the width as needed */
-  aspect-ratio: 1/1; /* Maintain square aspect ratio */
+  flex: 1 0 calc(10% - 10px);
+  aspect-ratio: 1/1;
   margin: 5px;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 2px solid #61dafb;
   border-radius: 8px;
-  background-color: #fff;
+  background-color: #282c34;
+  color: #61dafb;
+  font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .seat.selected {
-  background-color: #f0ad4e;
-  color: white;
+  background-color: #61dafb;
+  color: #282c34;
 }
 
 .seat.booked {
-  background-color: #d9534f;
-  color: white;
+  background-color: #ff6f61;
+  color: #282c34;
   cursor: not-allowed;
 }
 
-button.confirm {
-  background-color: #d9534f;
-  color: white;
+button.confirm,
+button.cancel {
+  background-color: #61dafb;
+  color: #282c34;
   border: none;
   padding: 10px 20px;
-  margin-right: 10px;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
 }
 
-button.cancel {
-  background-color: #5cb85c;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
+button.confirm:hover,
+button.cancel:hover {
+  background-color: #282c34;
+  color: #61dafb;
 }
