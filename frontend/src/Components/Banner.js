@@ -1,10 +1,11 @@
 import React from 'react';
-import { useAuth } from './Context.js';
+import { useAuth } from './Context'; // Adjust the path to your useAuth hook
+import { jwtDecode } from 'jwt-decode'; // Ensure jwtDecode is correctly imported
 
 function Banner({ searchQuery, handleSearch }) {
   const { token, setToken } = useAuth();
-
   const isLoggedIn = !!token;
+  const decodedToken = isLoggedIn ? jwtDecode(token) : null;
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -17,16 +18,24 @@ function Banner({ searchQuery, handleSearch }) {
 
   return (
     <div className="banner">
-      <div className="header">
-        <h1>Cinema E</h1>
-        <div className="login">
-          {isLoggedIn ? (
-            <button onClick={handleLogout}>Logout</button>
-          ) : (
-            <button onClick={handleLogin}>Login</button>
-          )}
-        </div>
+      <div className="greeting-container">
+        {isLoggedIn && decodedToken && (
+          <p className="greeting">Hello, {decodedToken.firstname}</p>
+        )}
       </div>
+
+      <div className="login">
+        {isLoggedIn ? (
+          <button onClick={handleLogout}>Logout</button>
+        ) : (
+          <button onClick={handleLogin}>Login</button>
+        )}
+      </div>
+
+      <div className="header">
+        <h1>Bulldawg Theater</h1>
+      </div>
+
       <div className="search-bar">
         <input
           type="text"

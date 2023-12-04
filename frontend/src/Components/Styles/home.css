@@ -1,182 +1,183 @@
 * {
-    padding: 0;
-    margin:0;
-    font-family: sans-serif;
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
 }
 
-.home{
-padding:1.5rem;
-background-color: rgb(99, 99, 99);
+.home {
+  padding: 1.5rem;
+  background-color: rgb(99, 99, 99);
 }
 
 .card-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin-top: 40px;
-  }
-  
-  .card {
-      width: 20rem;
-      margin: right 1.5em;
-      margin-bottom: 1.5rem;
-      flex-basis: 33%;
-     
-  }
-  
-  .card h2 {
-    font-size: 20px;
-    font-display: flex;
-    display: flex;
-  }
-  
-  .card iframe {
-    width: 100%;
-    height: 200px;
-    border-top-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-  }
- .search-bar {
-     display: flex;
-     align-items: center;
-     padding-bottom: 1.5rem;
- }
-  .search-bar input {
-    border: 0;
-    outline: 0;
-    margin-right: 0.2rem;
-    padding: 0.3rem;
-    border-radius: 1rem;
-  }
-  
-  .search-bar button {
-    border: 1px solid #ccc;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    padding: 0.5rem;
-    border-radius: 1rem;
-    background-color: #ffffff;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.card {
+  width: 20rem;
+  margin: right 1.5em;
+  margin-bottom: 1.5rem;
+  flex-basis: 33%;
+}
+
+.card h2 {
+  font-size: 20px;
+  font-display: flex;
+  display: flex;
+}
+
+.card iframe {
+  width: 100%;
+  height: 200px;
+  border-top-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.search-bar {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1.5rem;
+}
+.search-bar input {
+  border: 0;
+  outline: 0;
+  margin-right: 0.2rem;
+  padding: 0.3rem;
+  border-radius: 1rem;
+}
+
+.search-bar button {
+  border: 1px solid #ccc;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  padding: 0.5rem;
+  border-radius: 1rem;
+  background-color: #ffffff;
 }
 .search-bar button:hover {
-    background-color: #c2070e;
-  }
-  
+  background-color: #c2070e;
+}
+
 .header {
-padding-right: 3rem;
+  padding-right: 3rem;
 }
 .title {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 .login {
   background-color: #000;
   color: #fff;
   padding: 5px 10px;
-  width: 50px;
+  width: auto; /* Adjust width to auto so it adapts to the content */
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-
-  /* Optional: Add a box shadow for depth */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Horizontally center content */
+  align-items: center; /* Vertically center content */
+  text-align: center; /* Ensure text is centered */
+  min-width: 50px; /* Optional: Set a minimum width */
 }
 
 .login:hover {
   background-color: #0056b3;
 }
-  
-.book-button {
-    background-color: #000;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease; 
-  }
-  
-  .book-button:hover {
-    background-color: #ccc;
-  }
- 
 
+.book-button {
+  background-color: #000;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.book-button:hover {
+  background-color: #ccc;
+}
 
 .banner {
-    background-color: #1f1f1f; 
-    color: #fff;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
-    border-bottom: 2px solid #1b1b1b; 
-  }
-  
-  .banner h1 {
-    margin: 0;
-    font-size: 24px;
-    text-transform: uppercase; 
-  }
-  
-  .banner .login button {
-    background-color: transparent;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .banner .search-bar {
-    display: flex;
-    align-items: center;
-  }
-  
-  .banner .search-bar input {
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #fff;
-    color: #000;
-    font-size: 16px;
-    width: 300px;
-  }
-  
-  .banner .search-bar button {
-    background-color: #d4af37; 
-    color: #000;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-left: 10px;
-    text-transform: uppercase; 
-  }
-  
-  
-  .banner::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      to bottom,
-      #4e4e4e 0%,
-      #3b3b3b 50%,
-      #4e4e4e 100%
-    );
-    opacity: 0.5; /* Adjust the opacity to control the shine effect */
-    z-index: -1; /* Place the gradient behind the banner content */
-  }
-  .toggle-button {
-    display: flex;
-    justify-content: center;
-    gap: 10px; /* Adjust the gap between the buttons as needed */
-    margin-top: 30px;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease; 
-  }
+  background-color: #1f1f1f;
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between; /* Center the contents */
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-bottom: 2px solid #1b1b1b;
+}
 
+.greeting-container {
+  /* Center the greeting */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1; /* Allows the container to grow and take available space */
+}
+
+.banner h1 {
+  margin: 0;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+
+.banner .login button {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.banner .search-bar {
+  display: flex;
+  align-items: center;
+}
+
+.banner .search-bar input {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #000;
+  font-size: 16px;
+  width: 300px;
+}
+
+.banner .search-bar button {
+  background-color: #d4af37;
+  color: #000;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+  text-transform: uppercase;
+}
+
+.banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, #4e4e4e 0%, #3b3b3b 50%, #4e4e4e 100%);
+  opacity: 0.5; /* Adjust the opacity to control the shine effect */
+  z-index: -1; /* Place the gradient behind the banner content */
+}
+.toggle-button {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Adjust the gap between the buttons as needed */
+  margin-top: 30px;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
