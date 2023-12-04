@@ -1,34 +1,35 @@
-import React, { useState } from "react";
-import "../Styles/ManageMovies.css";
-import { useAuth } from "../Context";
+import React, { useState } from 'react';
+import '../Styles/ManageMovies.css';
+import { useAuth } from '../Context';
 
 function ManageMovies() {
   const [movieData, setMovieData] = useState({
-    title: "",
-    synopsis: "",
-    cast: "",
-    director: "",
-    producer: "",
-    category: "", 
-    trailer_url: "",
-    Poster_url: "", 
-    mpaa_rating: "",
-});
-  const [showtimeData, setShowtimeData] = useState({
-    movie_id: "",
-    show_date: "",
-    show_time: "",
-    duration: "",
+    title: '',
+    synopsis: '',
+    cast: '',
+    director: '',
+    producer: '',
+    category: '',
+    trailer_url: '',
+    Poster_url: '',
+    mpaa_rating: '',
+    isCurrentlyShowing: false,
   });
-  const [message, setMessage] = useState("");
+  const [showtimeData, setShowtimeData] = useState({
+    movie_id: '',
+    show_date: '',
+    show_time: '',
+    duration: '',
+  });
+  const [message, setMessage] = useState('');
   const [showAddMovieForm, setShowAddMovieForm] = useState(false);
   const API_URL =
-    process.env.REACT_APP_API_URL || "http://localhost:8080/admins";
+    process.env.REACT_APP_API_URL || 'http://localhost:8080/admins';
   const { token } = useAuth();
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    const newValue = type === "checkbox" ? checked : value;
+    const newValue = type === 'checkbox' ? checked : value;
 
     if (name in movieData) {
       setMovieData({ ...movieData, [name]: newValue });
@@ -46,23 +47,23 @@ function ManageMovies() {
 
     try {
       const response = await fetch(`${API_URL}/addMovie`, {
-        method: "POST",
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(movieData),
       });
-      console.log({movie:movieData});
+      console.log({ movie: movieData });
 
       if (response.ok) {
         const data = await response.json();
-        setMessage(data.message || "Movie added successfully");
+        setMessage(data.message || 'Movie added successfully');
       } else {
-        throw new Error("Failed to add movie");
+        throw new Error('Failed to add movie');
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       setMessage(error.message);
     }
   };
@@ -72,7 +73,7 @@ function ManageMovies() {
 
     try {
       const response = await fetch(`${API_URL}/addShowtime`, {
-        method: "POST",
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -84,10 +85,10 @@ function ManageMovies() {
         const data = await response.json();
         // Handle success
       } else {
-        throw new Error("Failed to add showtime");
+        throw new Error('Failed to add showtime');
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       // Handle error
     }
   };
@@ -187,27 +188,7 @@ function ManageMovies() {
               name="Poster_url"
               value={movieData.Poster_url}
               onChange={handleInputChange}
-              src={movieData.poster_url}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>ShowDate:</label>
-            <input
-              type="date"
-              name="show_date"
-              value={showtimeData.show_date}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Show Time:</label>
-            <input
-              type="time"
-              name="show_time"
-              value={showtimeData.show_time}
-              onChange={handleInputChange}
+              src={movieData.Poster_url}
               required
             />
           </div>
@@ -215,11 +196,11 @@ function ManageMovies() {
             <label>
               <input
                 type="checkbox"
-                name="comingSoon"
-                checked={movieData.comingSoon}
+                name="isCurrentlyShowing"
+                checked={movieData.isCurrentlyShowing}
                 onChange={handleInputChange}
               />
-              Coming Soon
+              Currently Showing
             </label>
           </div>
           <button type="submit" className="submit-button">
