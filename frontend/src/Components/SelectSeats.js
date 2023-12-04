@@ -47,28 +47,25 @@ const SelectSeats = () => {
   };
 
   const generateSeats = () => {
+  return seats.map((seat) => {
+    const seatId = seat.seat_id;
+    const isBooked = seat.is_booked;
+    const isSeatSelected = selectedSeats.has(seatId);
+    const seatClassName = `seat ${isSeatSelected ? 'selected' : ''} ${isBooked ? 'booked' : ''}`;
+
     return (
-      <div className="seat-selector">
-        {seats.map((seat) => {
-          const seatId = seat.seat_id;
-          const isBooked = seat.is_booked;
-          const isSeatSelected = selectedSeats.has(seatId);
-          const seatClassName = `seat ${isSeatSelected ? 'selected' : ''} ${isBooked ? 'booked' : ''}`;
-  
-          return (
-            <button
-              key={seatId}
-              className={seatClassName}
-              onClick={() => !isBooked && toggleSeatSelection(seatId)}
-              disabled={isBooked}
-            >
-              {seat.seat_number}
-            </button>
-          );
-        })}
-      </div>
+      <button
+        key={seatId}
+        className={seatClassName}
+        onClick={() => !isBooked && toggleSeatSelection(seatId)}
+        disabled={isBooked}
+      >
+        {seat.seat_number}
+      </button>
     );
-  };
+  });
+};
+
   
   
   
