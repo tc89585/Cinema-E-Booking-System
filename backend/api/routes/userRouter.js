@@ -7,6 +7,8 @@ const { authenticateUser } = require('../middlewares/authentication');
 router.post('/', userController.createUser); //works
 router.post('/login', userController.login); //works
 router.get('/forgotpassword', userController.forgotPassword);
+router.post('/sendCode', userController.sendCode);
+router.post('/checkCode', userController.checkCode);
 
 // User profile editing routes
 router.put('/edit-profile', authenticateUser, userController.editProfile); // Edit profile

@@ -22,6 +22,93 @@ const getUserById = async (req, res) => {
   }
 };
 
+
+// Function to generate a random verification code
+const generateVerificationCode = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// In-memory storage for verification codes (you should replace this with a database in a production environment)
+const verificationCodeStore = {};
+
+// Function to store the verification code
+const storeVerificationCode = (email, code) => {
+  verificationCodeStore[email] = code;
+  console.log('Verification Code Store:', verificationCodeStore);
+};
+
+// Function to retrieve the stored verification code
+const getStoredVerificationCode = (email) => {
+  return verificationCodeStore[email];
+};
+
+
+
+// New route to send verification code
+const sendCode = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const verificationCode = generateVerificationCode(); // Implement a function to generate a verification code
+    storeVerificationCode(email, verificationCode); // Implement a function to store the code (e.g., in-memory cache, database)
+
+    // Send the verification code to the user's email using nodemailer or any other email service
+
+    const { createTransport } = require('nodemailer');
+
+    const transporter = createTransport({
+      host: 'smtp-relay.brevo.com',
+      port: 587,
+      auth: {
+        user: 'cinemaebook080@gmail.com',
+        pass: 'xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI',
+      },
+    });
+
+    const emailText = `Your verification code is: ${verificationCode}`;
+
+    const mailOptions = {
+      from: 'cinemaebook080@gmail.com',
+      to: email, // Use the user's email address
+      subject: 'Verification Code',
+      text: emailText,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    });
+    
+    res.status(200).json({ message: 'Verification code sent successfully' });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+    console.error(error);
+  }
+};
+
+// New route to check verification code
+const checkCode = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+    const storedCode = getStoredVerificationCode(email); // Implement a function to retrieve the stored code
+    console.log(`Code entered by user: ${code}`);
+    console.log(`Stored code for ${email}: ${storedCode}`);
+    if (code === storedCode) {
+      // Verification successful
+      res.status(200).json({ message: 'Verification successful' });
+    } else {
+      // Verification failed
+      res.status(400).json({ message: 'Invalid verification code' });
+    }
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+    console.error(error);
+  }
+};
+
+
 const createUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -326,4 +413,6 @@ module.exports = {
   createPaymentMethod,
   getUserById,
   getBookingHistory,
+  sendCode,
+  checkCode
 };
