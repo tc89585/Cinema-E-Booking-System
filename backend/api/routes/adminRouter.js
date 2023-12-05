@@ -16,7 +16,7 @@ router.post('/createPromotion', adminAuthMiddleware, adminController.createPromo
 router.put('/updateMovieInfo', adminAuthMiddleware, adminController.updateMovieInfo);
 
 // Route to delete a movie
-router.delete('/deleteMovie/:movieId', adminAuthMiddleware, adminController.deleteMovie);
+router.delete('/deleteMovie/:movie_id', adminAuthMiddleware, adminController.deleteMovie);
 
 // Route to edit ticket prices
 router.put('/editTicketPrice', adminAuthMiddleware, adminController.editTicketPrice);
