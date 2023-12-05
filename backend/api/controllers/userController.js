@@ -262,7 +262,7 @@ const forgotPassword = async (req, res) => {
 const editProfile = async (req, res) => {
   try {
     const userId = req.user.user_id;
-    const { firstname, lastname, billing_address, password, is_subscribed } =
+    const { firstname, lastname, billing_address, current_password, password, is_subscribed } =
       req.body;
 
     // Query the database for the current user
@@ -272,15 +272,23 @@ const editProfile = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Check if the current password provided matches the user's current password
+    const isPasswordValid = await bcrypt.compare(current_password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
     // Update user details
     user.firstname = firstname;
     user.lastname = lastname;
     user.billing_address = billing_address;
     user.is_subscribed = is_subscribed;
 
+    // If a new password is provided, hash and update it
     if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      user.password = hashedPassword;
+      const hashedNewPassword = await bcrypt.hash(password, 10);
+      user.password = hashedNewPassword;
     }
 
     // Save the updated user information
