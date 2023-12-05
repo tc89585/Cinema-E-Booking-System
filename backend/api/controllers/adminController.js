@@ -56,7 +56,7 @@ const AdminController = {
       });
   
       for (const email of emailAddresses) {
-        const emailText = `Dear user, we have a new promotion for you: ${promotion.description}`;
+        const emailText = `Dear customer, we have a winter sale going on. Please use this code at checkout: ${promotion.description}`;
   
         const mailOptions = {
           from: 'cinemaebook080@gmail.com',
