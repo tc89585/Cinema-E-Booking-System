@@ -7,7 +7,7 @@ const { authenticateUser, isAdmin } = require('../middlewares/authentication'); 
 const adminAuthMiddleware = [authenticateUser, isAdmin];
 
 // Route to create a new admin
-router.post('/createAdmin', adminAuthMiddleware, adminController.createAdmin);
+router.patch('/updateUserRoleToAdmin', adminAuthMiddleware, adminController.createAdmin);
 
 // Route to create a promotion
 router.post('/createPromotion', adminAuthMiddleware, adminController.createPromotion);
