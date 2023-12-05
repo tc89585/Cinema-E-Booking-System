@@ -21,6 +21,7 @@ function Login() {
   const [card_type, setCardType] = useState('');
   const [expiration_date, setCardExpiration] = useState('');
   const [billing_address, setBillingAddress] = useState('');
+  const [isSignupClicked, setIsSignupClicked] = useState(false);
 
 
 
@@ -66,6 +67,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     if (isLogin) {
       try {
         const response = await fetch(`${API_URL}/users/login`, {
@@ -75,17 +77,29 @@ function Login() {
           },
           body: JSON.stringify({ email, password }),
         });
-
+  
         if (response.status === 200) {
           const userData = await response.json();
           console.log('Login successful!');
           localStorage.setItem('token', userData.token);
-          setToken(userData.token); // Update the token in AuthContext
-          navigate('/'); // Redirect to the homepage or dashboard
+          setToken(userData.token);
+
+         
+        // Check if the logged-in user is an admin
+        if (userData.role === 'admin') {
+          // Redirect to the admin page
+          navigate('/admin');
+        } else {
+          // Redirect to the homepage or dashboard for regular users
+          navigate('/');
+        }
+          
+    
         } else {
           setErrorMessage(
             'Authentication failed. Please check your email and password.'
           );
+          
         }
       } catch (error) {
         console.error('Error:', error);
@@ -110,29 +124,34 @@ function Login() {
           billing_address,
 
         };
-        try {
-          const response = await fetch(`${API_URL}/users`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(registrationData),
-          });
 
-          if (response.ok) {
-            setIsRegistered(true);
-            setErrorMessage('');
-          } else {
-            const errorData = await response.json();
-            setErrorMessage(errorData.message);
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          setErrorMessage('An error occurred. Please try again later.');
+        
+        try {
+        const response = await fetch(`${API_URL}/users`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(registrationData),
+        });
+
+        if (response.ok) {
+          setIsRegistered(true);
+          setErrorMessage('');
+
+          // Navigate to the verification page
+          navigate('/verify');
+        } else {
+          const errorData = await response.json();
+          setErrorMessage(errorData.message);
         }
+      } catch (error) {
+        console.error('Error:', error);
+        setErrorMessage('An error occurred. Please try again later.');
       }
     }
-  };
+  }
+};
 
   return (
     <div className="login-container">
@@ -250,7 +269,7 @@ function Login() {
               <input
                 type="text"
                 className="card-expiration-input"
-                placeholder="Card Expiration Date (MM/YYYY)"
+                placeholder="Card Expiration Date"
                 value={expiration_date}
                 onChange={handleCardExpirationChange}
                 required

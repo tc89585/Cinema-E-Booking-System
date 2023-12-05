@@ -1,67 +1,66 @@
 .forgot-password-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f5f5f5;
-  }
-  
-  .forgot-password-form {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    width: 400px; /* Adjust the width as needed */
-    text-align: center;
-    transition: transform 0.3s;
-    position: relative;
-  }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    text-align: left;
-  }
-  
-  input[type="email"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    outline: none;
-  }
-  
-  .reset-password-button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .reset-password-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .form-group h2 {
-    margin: 5; /* Remove margin to align with input field */
-  }
-  
-  .form-group:last-child {
-    text-align: center;
-    margin-top: 20px;
-  }
-  
-  .toggle-link {
-    color: #007bff;
-    cursor: pointer;
-    text-decoration: underline;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.forgot-password-form {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  width: 400px; /* Adjust the width as needed */
+  text-align: center;
+  transition: transform 0.3s;
+  position: relative;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  text-align: left;
+}
+
+input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  outline: none;
+}
+
+.reset-password-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.reset-password-button:hover {
+  background-color: #0056b3;
+}
+
+.form-group h2 {
+  margin: 5; /* Remove margin to align with input field */
+}
+
+.form-group:last-child {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.toggle-link {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+}
