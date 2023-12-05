@@ -294,11 +294,11 @@ const editProfile = async (req, res) => {
 };
 const changePassword = async (req, res) => {
   try {
-    const userId = req.user.user_id;
-    const { current_password, new_password } = req.body;
+    const user_id = req.user.user_id;
+    const { current_password, password } = req.body;
 
     // Query the database for the current user
-    const user = await User.findByPk(userId);
+    const user = await User.findByPk(user_id);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -312,7 +312,7 @@ const changePassword = async (req, res) => {
     }
 
     // Hash and update the new password
-    const hashedNewPassword = await bcrypt.hash(new_password, 10);
+    const hashedNewPassword = await bcrypt.hash(password, 10);
     user.password = hashedNewPassword;
 
     // Save the updated user information
