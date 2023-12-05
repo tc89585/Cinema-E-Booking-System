@@ -17,8 +17,30 @@ function Login() {
   const [lastname, setLastname] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const navigate = useNavigate();
+  const [card_number, setCreditCard] = useState('');
+  const [card_type, setCardType] = useState('');
+  const [expiration_date, setCardExpiration] = useState('');
+  const [billing_address, setBillingAddress] = useState('');
+
+
 
   const { setToken } = useAuth(); // Use the setToken function from AuthContext
+
+  const handleCreditCardChange = (e) => {
+    setCreditCard(e.target.value);
+  };
+
+  const handleCardTypeChange = (e) => {
+    setCardType(e.target.value);
+  };
+
+  const handleCardExpirationChange = (e) => {
+    setCardExpiration(e.target.value);
+  };
+
+  const handleBillingAddressChange = (e) => {
+    setBillingAddress(e.target.value);
+  };
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -82,6 +104,11 @@ function Login() {
           is_subscribed: isSubscribed,
           firstname,
           lastname,
+          card_type,
+          card_number,
+          expiration_date,
+          billing_address,
+
         };
         try {
           const response = await fetch(`${API_URL}/users`, {
@@ -174,6 +201,58 @@ function Login() {
                 placeholder="Confirm Password"
                 value={passwordConfirm}
                 onChange={handlePasswordConfirmChange}
+                required
+              />
+            </div>
+          )}
+          {!isLogin && (
+            <div className="form-group">
+              <input
+                type="text"
+                className="credit-card-input"
+                placeholder="Credit Card"
+                value={card_number}
+                onChange={handleCreditCardChange}
+                required
+              />
+            </div>
+          )}
+          {!isLogin && (
+            <div className="form-group">
+              <select
+                className="card-type-input"
+                value={card_type}
+                onChange={handleCardTypeChange}
+              >
+                <option value="" disabled>
+                  Select Card Type
+                </option>
+                <option value="visa">Visa</option>
+                <option value="mastercard">MasterCard</option>
+                <option value="amex">AMX</option>
+              </select>
+            </div>
+          )}
+          {!isLogin && (
+            <div className="form-group">
+              <input
+                type="text"
+                className="billing-address-input"
+                placeholder="Billing Address"
+                value={billing_address}
+                onChange={handleBillingAddressChange}
+                required
+              />
+            </div>
+          )}
+          {!isLogin && (
+            <div className="form-group">
+              <input
+                type="text"
+                className="card-expiration-input"
+                placeholder="Card Expiration Date (MM/YYYY)"
+                value={expiration_date}
+                onChange={handleCardExpirationChange}
                 required
               />
             </div>

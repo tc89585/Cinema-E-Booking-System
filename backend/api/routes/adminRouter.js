@@ -7,16 +7,16 @@ const { authenticateUser, isAdmin } = require('../middlewares/authentication'); 
 const adminAuthMiddleware = [authenticateUser, isAdmin];
 
 // Route to create a new admin
-router.post('/createAdmin', adminAuthMiddleware, adminController.createAdmin);
+router.patch('/createAdmin', adminAuthMiddleware, adminController.createAdmin);
 
 // Route to create a promotion
 router.post('/createPromotion', adminAuthMiddleware, adminController.createPromotion);
 
 // Route to update movie information
-router.put('/updateMovieInfo', adminAuthMiddleware, adminController.updateMovieInfo);
+router.patch('/updateMovieInfo', adminAuthMiddleware, adminController.updateMovieInfo);
 
 // Route to delete a movie
-router.delete('/deleteMovie/:movieId', adminAuthMiddleware, adminController.deleteMovie);
+router.delete('/deleteMovie/:movie_id', adminAuthMiddleware, adminController.deleteMovie);
 
 // Route to edit ticket prices
 router.put('/editTicketPrice', adminAuthMiddleware, adminController.editTicketPrice);
@@ -44,5 +44,8 @@ router.get('/getAllUsers',adminAuthMiddleware, adminController.getAllUsers);
 
 // Route to add movie
 router.post('/addMovie',adminAuthMiddleware, adminController.addMovie);
+
+// Route to delete promotion
+router.delete('/deletePromotion/:promotion_id', adminAuthMiddleware, adminController.deletePromotion);
 
 module.exports = router;

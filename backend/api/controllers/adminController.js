@@ -14,18 +14,30 @@ const AdminController = {
   // Function to create a new admin user
   createAdmin: async (req, res) => {
     try {
-      const { password, ...adminData } = req.body;
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const admin = await User.create({ ...adminData, password: hashedPassword, role: 'admin' });
-      res.status(201).json({
-        message: 'Admin created successfully',
-        user_id: admin.UserID,
-        email: admin.Email,
-      });
+        // Extract user identifier (e.g., email or user_id) from the request
+        const { email } = req.body; // Assuming we're using email to identify the user
+
+        // Find the user by email
+        const user = await User.findOne({ where: { email: email } });
+
+        // Check if the user exists
+        if (!user) {
+            return res.status(404).send({ message: "User not found." });
+        }
+
+        // Update the user's role to 'admin'
+        user.role = 'admin';
+        await user.save();
+
+        res.status(200).json({
+            message: 'User role updated to admin successfully',
+            user_id: user.user_id,
+            email: user.email,
+        });
     } catch (error) {
-      res.status(500).send({ message: error.message });
+        res.status(500).send({ message: error.message });
     }
-  },
+},
 
   // Function to create a promotion
   createPromotion: async (req, res) => {
@@ -56,7 +68,7 @@ const AdminController = {
       });
   
       for (const email of emailAddresses) {
-        const emailText = `Dear user, we have a new promotion for you: ${promotion.description}`;
+        const emailText = `Dear customer, we have a winter sale going on. Please use this code at checkout: ${promotion.description}`;
   
         const mailOptions = {
           from: 'cinemaebook080@gmail.com',
@@ -79,26 +91,27 @@ const AdminController = {
   },
 
   // Function to update movie information
-  updateMovieInfo: async (req, res) => {
+    updateMovieInfo: async (req, res) => {
     const { movieId, updateData } = req.body;
     try {
       const movie = await Movie.findByPk(movieId);
       if (!movie) {
         return res.status(404).send({ message: 'Movie not found' });
       }
+      // Object.assign is suitable for partial updates
       Object.assign(movie, updateData);
       await movie.save();
       res.status(200).json({ message: 'Movie updated successfully', movie });
     } catch (error) {
       res.status(500).send({ message: error.message });
     }
-  },
+},
 
   // Function to delete a movie
   deleteMovie: async (req, res) => {
-    const { movieId } = req.params;
+    const { movie_id } = req.params;
     try {
-      const movie = await Movie.findByPk(movieId);
+      const movie = await Movie.findByPk(movie_id);
       if (!movie) {
         return res.status(404).send({ message: 'Movie not found' });
       }
@@ -146,83 +159,81 @@ const AdminController = {
   // Function to add a new showtime
   addShowtime: async (req, res) => {
     try {
-      // Extract the showtime data from the request
-      const { movie_id, show_date, show_time, duration } = req.body;
-  
-      // Check if a showtime for this movie at the same date and time already exists
-      const existingShowtime = await Showtime.findOne({
-        where: {
-          movie_id: movie_id,
-          show_date: show_date,
-          show_time: show_time
+        // Extract showtime data and movie title from the request
+        const { title, show_date, show_time, duration } = req.body;
+
+        // Find the movie by title
+        const movie = await Movie.findOne({ where: { title: title } });
+
+        // Check if the movie exists
+        if (!movie) {
+            return res.status(404).send({ message: "Movie not found." });
         }
-      });
-  
-      // If an existing showtime is found, send an error response
-      if (existingShowtime) {
-        console.error("Showtime for this movie at the specified date and time already exists.");
-        return res.status(400).send({ message: "Showtime already exists for this movie at the specified date and time." });
-      }
-  
-      // Generate a unique name for the new showroom
-      const showroomName = `Showroom-${Date.now()}`;
-  
-      // Create a new showroom
-      let newShowroom;
-      try {
-        newShowroom = await Showroom.create({
-          showroom_name: showroomName,
-          seat_rows: 5,
-          seat_columns: 10,
-          seat_capacity: 50
+
+        // Check if a showtime for this movie at the same date and time already exists
+        const existingShowtime = await Showtime.findOne({
+            where: {
+                movie_id: movie.movie_id,
+                show_date,
+                show_time
+            }
         });
-      } catch (showroomError) {
-        console.error("Error creating new showroom: ", showroomError);
-        return res.status(500).send({ message: "Failed to create new showroom." });
-      }
-  
-      // Check if the new showroom was created successfully
-      if (!newShowroom || !newShowroom.showroom_id) {
-        console.error("Failed to create new showroom, no showroom ID returned.");
-        return res.status(500).send({ message: "Failed to create new showroom." });
-      }
-  
-      console.log("New showroom created with ID:", newShowroom.showroom_id);
-  
-      // Create 50 seats in a 5x10 arrangement for the new showroom
-      const rows = ['A', 'B', 'C', 'D', 'E'];
-      const columns = 10;
-      for (let row of rows) {
-        for (let col = 1; col <= columns; col++) {
-          await Seat.create({
-            showroom_id: newShowroom.showroom_id,
-            seat_number: `${row}${col}`,
-            is_booked: false
-          });
+
+        // If an existing showtime is found, send an error response
+        if (existingShowtime) {
+            console.error("Showtime for this movie at the specified date and time already exists.");
+            return res.status(400).send({ message: "Showtime already exists for this movie at the specified date and time." });
         }
-      }
-  
-      // Now create the showtime using the new showroom's ID
-      const newShowtime = await Showtime.create({
-        movie_id,
-        showroom_id: newShowroom.showroom_id,
-        show_date,
-        show_time,
-        duration
-      });
-  
-      console.log("New showtime created with ID:", newShowtime.showtime_id);
-  
-      res.status(201).json({
-        message: 'Showtime and showroom added successfully',
-        showtime_id: newShowtime.showtime_id,
-        showroom_id: newShowroom.showroom_id
-      });
+
+        // Generate a unique name for the new showroom
+        const showroomName = `Showroom-${Date.now()}`;
+
+        // Create a new showroom
+        const newShowroom = await Showroom.create({
+            showroom_name: showroomName,
+            seat_rows: 5,
+            seat_columns: 10,
+            seat_capacity: 50
+        });
+
+        // Check if the new showroom was created successfully
+        if (!newShowroom || !newShowroom.showroom_id) {
+            console.error("Failed to create new showroom, no showroom ID returned.");
+            return res.status(500).send({ message: "Failed to create new showroom." });
+        }
+
+        console.log("New showroom created with ID:", newShowroom.showroom_id);
+
+        // Create 50 seats in a 5x10 arrangement for the new showroom
+        const rows = ['A', 'B', 'C', 'D', 'E'];
+        const columns = 10;
+        for (let row of rows) {
+            for (let col = 1; col <= columns; col++) {
+                await Seat.create({
+                    showroom_id: newShowroom.showroom_id,
+                    seat_number: `${row}${col}`,
+                    is_booked: false
+                });
+            }
+        }
+
+        // Create the showtime using the new showroom's ID
+        const newShowtime = await Showtime.create({
+            movie_id: movie.movie_id,
+            showroom_id: newShowroom.showroom_id,
+            show_date,
+            show_time,
+            duration
+        });
+
+        res.status(201).json({ message: 'Showtime added successfully', newShowtime });
+
     } catch (error) {
-      console.error("Error in addShowtime: ", error);
-      res.status(500).send({ message: error.message });
+        console.error("Error adding showtime: ", error);
+        return res.status(500).send({ message: "Failed to add new showtime." });
     }
-  },
+},
+
   
 
   // Function to update a showtime
@@ -335,35 +346,67 @@ const AdminController = {
           res.status(500).send({ message: 'Error fetching user data' });
       }
   },
-    addMovie: async (req, res) => {
-      try {
-          const { title, category, director, producer, synopsis, mpaa_rating, cast, Poster_url, trailer_url} = req.body;
-
-          // Validate input
-          if (!title || !category || !director || !producer || !synopsis|| !mpaa_rating || !cast || !Poster_url || !trailer_url ) {
-              return res.status(400).send({ message: "All fields are required" });
-          }
-
-          // Create a new movie record
-          const newMovie = await Movie.create({
-            title,
-            category,
-            director,
-            producer,
-            synopsis,
-            mpaa_rating,
-            cast,
-            Poster_url,
-            trailer_url
-          });
-
-          // Send a success response
-          res.status(201).send({ message: "Movie added successfully", movie: newMovie });
-      } catch (error) {
-          console.error("Error adding movie:", error);
-          res.status(500).send({ message: "Error adding new movie" });
+  addMovie: async (req, res) => {
+    try {
+      const { title, category, director, producer, synopsis, mpaa_rating, cast, Poster_url, trailer_url } = req.body;
+  
+      // Validate input
+      if (!title || !category || !director || !producer || !synopsis || !mpaa_rating || !cast || !Poster_url || !trailer_url) {
+        return res.status(400).send({ message: "All fields are required" });
       }
-  }
+  
+      // Check if the movie with the same title already exists
+      const existingMovie = await Movie.findOne({ where: { title } });
+  
+      if (existingMovie) {
+        return res.status(409).send({ message: "Movie with the same title already exists" });
+      }
+  
+      // Create a new movie record
+      const newMovie = await Movie.create({
+        title,
+        category,
+        director,
+        producer,
+        synopsis,
+        mpaa_rating,
+        cast,
+        Poster_url,
+        trailer_url,
+      });
+  
+      // Send a success response
+      res.status(201).send({ message: "Movie added successfully", movie: newMovie });
+    } catch (error) {
+      console.error("Error adding movie:", error);
+      res.status(500).send({ message: "Error adding new movie" });
+    }
+  },
+  
+  deletePromotion: async (req, res) => {
+    try {
+        const { promotion_id } = req.params;
+
+        // Delete the promotion with the given ID
+        const result = await Promotion.destroy({
+            where: {
+                promotion_id: promotion_id
+            }
+        });
+
+        if (result === 0) {
+            // No promotion found with the given ID
+            return res.status(404).json({ message: 'Promotion not found' });
+        }
+
+        // Respond back that the deletion was successful
+        res.status(200).json({ message: 'Promotion deleted successfully' });
+    } catch (error) {
+        // Handle any errors that occur during the process
+        res.status(500).send({ message: error.message });
+        console.error('Error deleting promotion:', error);
+    }
+}
 };
 
 

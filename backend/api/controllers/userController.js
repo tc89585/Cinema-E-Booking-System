@@ -4,6 +4,7 @@ const Booking = require('../models/BookingModel');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
+const { createTransport } = require('nodemailer');
 
 const getUserById = async (req, res) => {
   const user_id = req.user.user_id;
@@ -107,35 +108,57 @@ const checkCode = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const {
+      email, password, firstname, lastname, billing_address, role, account_status, is_subscribed,
+      // Payment information fields
+      card_type, card_number, expiration_date
+    } = req.body;
 
     // Hash the password using bcrypt
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ email, password: hashedPassword });
+    // Create the user
+    const user = await User.create({ 
+      email, 
+      password: hashedPassword,
+      firstname,
+      lastname,
+      billing_address,
+      role,
+      account_status,
+      is_subscribed
+    });
 
-    const { createTransport } = require('nodemailer');
+    // If payment information is provided, create payment information
+    if (card_type && card_number && expiration_date) {
+      await PaymentInformation.create({
+        user_id: user.user_id,
+        card_type,
+        card_number,
+        expiration_date
+      });
+    }
 
+    // Set up nodemailer transporter
     const transporter = createTransport({
       host: 'smtp-relay.brevo.com',
       port: 587,
       auth: {
-        user: 'cinemaebook080@gmail.com',
-        pass: 'xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI',
+        user: 'cinemaebook080@gmail.com', // Replace with your email
+        pass: 'xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI' // Replace with your SMTP password
       },
     });
 
-    const emailText = `
-      Thank you for creating an account with us. We are happy that you get to be a part of the cinema-ebook family.
-    `;
+    const emailText = `Thank you for creating an account with us, ${firstname}. We are happy that you get to be a part of the cinema-ebook family.`;
 
     const mailOptions = {
-      from: 'cinemaebook080@gmail.com',
+      from: 'cinemaebook080@gmail.com', // Replace with your email
       to: user.email, // Use the user's email address
       subject: 'Welcome to Cinema eBook',
       text: emailText,
     };
 
+    // Send the welcome email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Error sending email:', error);
@@ -144,11 +167,13 @@ const createUser = async (req, res) => {
       }
     });
 
+    // Respond with the created user information
     res.status(201).json({
       message: 'User created successfully',
       userId: user.user_id,
       email: user.email,
     });
+
   } catch (error) {
     res.status(500).send({ message: error.message });
     console.error(error);
@@ -199,77 +224,41 @@ const login = async (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     console.log('Request Body:', req.body);
-    const { email } = req.body;
+    const { email, password } = req.body;
 
     // Find the user based on the provided email
     const user = await User.findOne({ where: { email } });
 
-    // Ensure the user is found
-    if (!user) {
-      return res
-        .status(401)
-        .json({ message: 'User does not exist with that email' });
-    }
+    // Step 2: Update the user's password in the database
+    if (user) {
+      // Check if the password is a non-empty string
+      if (password && typeof password === 'string' && password.trim().length > 0) {
+        const saltRounds = 10; // Adjust the number of salt rounds based on your security requirements
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        user.password = hashedPassword;
+        await user.save();
 
-    // Generate a unique token for password reset
-    const resetToken = jwt.sign({ userId: user.user_id }, 'your-secret-key', {
-      expiresIn: '1h',
-    });
-
-    // Save the reset token and expiration time to the user record
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-
-    await user.save();
-
-    // Create the reset link with the token
-    const resetLink = `http://localhost:8080/users/forgotPassword?token=${encodeURIComponent(
-      resetToken
-    )}`;
-
-    // Send the password reset email to the user with the reset link
-    const { createTransport } = require('nodemailer');
-    const transporter = createTransport({
-      host: 'smtp-relay.brevo.com',
-      port: 587,
-      auth: {
-        user: 'cinemaebook080@gmail.com',
-        pass: 'xsmtpsib-540cb9169874497c3d6ec6ee47c8359e020c90f21915faacbcc030a54761c014-TkKzbwDOBRGmf6aI',
-      },
-    });
-
-    const emailText = `
-      Thank you for creating an account with us. We are happy that you get to be a part of the cinema-ebook family.
-    `;
-
-    const mailOptions = {
-      from: 'cinemaebook080@gmail.com',
-      to: user.email,
-      subject: 'Welcome to Cinema eBook',
-      text: `You can reset your password by clicking on the following link: ${resetLink}`,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending email:', error);
+        // You can return a success message or any other indication if needed
+        return res.status(200).json({ success: true, message: 'Password updated successfully' });
       } else {
-        console.log('Email sent:', info.response);
+        // Handle the case where the password is empty or not a string
+        return res.status(400).json({ success: false, message: 'Invalid password' });
       }
-    });
-
-    res.status(201).json({
-      message: 'Password reset initiated successfully',
-    });
+    } else {
+      // Handle case where user with the given email is not found
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
   } catch (error) {
-    console.error(error);
-    res.status(500).send({ message: error.message });
+    // Handle any errors that may occur during the process
+    console.error('Error in forgotPassword:', error);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };
 
 const editProfile = async (req, res) => {
   try {
     const userId = req.user.user_id;
-    const { firstname, lastname, billing_address, password, is_subscribed } =
+    const { firstname, lastname, billing_address, current_password, password, is_subscribed } =
       req.body;
 
     // Query the database for the current user
@@ -279,15 +268,23 @@ const editProfile = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Check if the current password provided matches the user's current password
+    const isPasswordValid = await bcrypt.compare(current_password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
     // Update user details
     user.firstname = firstname;
     user.lastname = lastname;
     user.billing_address = billing_address;
     user.is_subscribed = is_subscribed;
 
+    // If a new password is provided, hash and update it
     if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      user.password = hashedPassword;
+      const hashedNewPassword = await bcrypt.hash(password, 10);
+      user.password = hashedNewPassword;
     }
 
     // Save the updated user information
