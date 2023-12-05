@@ -14,18 +14,30 @@ const AdminController = {
   // Function to create a new admin user
   createAdmin: async (req, res) => {
     try {
-      const { password, ...adminData } = req.body;
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const admin = await User.create({ ...adminData, password: hashedPassword, role: 'admin' });
-      res.status(201).json({
-        message: 'Admin created successfully',
-        user_id: admin.UserID,
-        email: admin.Email,
-      });
+        // Extract user identifier (e.g., email or user_id) from the request
+        const { email } = req.body; // Assuming we're using email to identify the user
+
+        // Find the user by email
+        const user = await User.findOne({ where: { email: email } });
+
+        // Check if the user exists
+        if (!user) {
+            return res.status(404).send({ message: "User not found." });
+        }
+
+        // Update the user's role to 'admin'
+        user.role = 'admin';
+        await user.save();
+
+        res.status(200).json({
+            message: 'User role updated to admin successfully',
+            user_id: user.user_id,
+            email: user.email,
+        });
     } catch (error) {
-      res.status(500).send({ message: error.message });
+        res.status(500).send({ message: error.message });
     }
-  },
+},
 
   // Function to create a promotion
   createPromotion: async (req, res) => {
