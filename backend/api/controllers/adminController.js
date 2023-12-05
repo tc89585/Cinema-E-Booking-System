@@ -147,83 +147,81 @@ const AdminController = {
   // Function to add a new showtime
   addShowtime: async (req, res) => {
     try {
-      // Extract the showtime data from the request
-      const { movie_id, show_date, show_time, duration } = req.body;
-  
-      // Check if a showtime for this movie at the same date and time already exists
-      const existingShowtime = await Showtime.findOne({
-        where: {
-          movie_id: movie_id,
-          show_date: show_date,
-          show_time: show_time
+        // Extract showtime data and movie title from the request
+        const { title, show_date, show_time, duration } = req.body;
+
+        // Find the movie by title
+        const movie = await Movie.findOne({ where: { title: title } });
+
+        // Check if the movie exists
+        if (!movie) {
+            return res.status(404).send({ message: "Movie not found." });
         }
-      });
-  
-      // If an existing showtime is found, send an error response
-      if (existingShowtime) {
-        console.error("Showtime for this movie at the specified date and time already exists.");
-        return res.status(400).send({ message: "Showtime already exists for this movie at the specified date and time." });
-      }
-  
-      // Generate a unique name for the new showroom
-      const showroomName = `Showroom-${Date.now()}`;
-  
-      // Create a new showroom
-      let newShowroom;
-      try {
-        newShowroom = await Showroom.create({
-          showroom_name: showroomName,
-          seat_rows: 5,
-          seat_columns: 10,
-          seat_capacity: 50
+
+        // Check if a showtime for this movie at the same date and time already exists
+        const existingShowtime = await Showtime.findOne({
+            where: {
+                movie_id: movie.movie_id,
+                show_date,
+                show_time
+            }
         });
-      } catch (showroomError) {
-        console.error("Error creating new showroom: ", showroomError);
-        return res.status(500).send({ message: "Failed to create new showroom." });
-      }
-  
-      // Check if the new showroom was created successfully
-      if (!newShowroom || !newShowroom.showroom_id) {
-        console.error("Failed to create new showroom, no showroom ID returned.");
-        return res.status(500).send({ message: "Failed to create new showroom." });
-      }
-  
-      console.log("New showroom created with ID:", newShowroom.showroom_id);
-  
-      // Create 50 seats in a 5x10 arrangement for the new showroom
-      const rows = ['A', 'B', 'C', 'D', 'E'];
-      const columns = 10;
-      for (let row of rows) {
-        for (let col = 1; col <= columns; col++) {
-          await Seat.create({
-            showroom_id: newShowroom.showroom_id,
-            seat_number: `${row}${col}`,
-            is_booked: false
-          });
+
+        // If an existing showtime is found, send an error response
+        if (existingShowtime) {
+            console.error("Showtime for this movie at the specified date and time already exists.");
+            return res.status(400).send({ message: "Showtime already exists for this movie at the specified date and time." });
         }
-      }
-  
-      // Now create the showtime using the new showroom's ID
-      const newShowtime = await Showtime.create({
-        movie_id,
-        showroom_id: newShowroom.showroom_id,
-        show_date,
-        show_time,
-        duration
-      });
-  
-      console.log("New showtime created with ID:", newShowtime.showtime_id);
-  
-      res.status(201).json({
-        message: 'Showtime and showroom added successfully',
-        showtime_id: newShowtime.showtime_id,
-        showroom_id: newShowroom.showroom_id
-      });
+
+        // Generate a unique name for the new showroom
+        const showroomName = `Showroom-${Date.now()}`;
+
+        // Create a new showroom
+        const newShowroom = await Showroom.create({
+            showroom_name: showroomName,
+            seat_rows: 5,
+            seat_columns: 10,
+            seat_capacity: 50
+        });
+
+        // Check if the new showroom was created successfully
+        if (!newShowroom || !newShowroom.showroom_id) {
+            console.error("Failed to create new showroom, no showroom ID returned.");
+            return res.status(500).send({ message: "Failed to create new showroom." });
+        }
+
+        console.log("New showroom created with ID:", newShowroom.showroom_id);
+
+        // Create 50 seats in a 5x10 arrangement for the new showroom
+        const rows = ['A', 'B', 'C', 'D', 'E'];
+        const columns = 10;
+        for (let row of rows) {
+            for (let col = 1; col <= columns; col++) {
+                await Seat.create({
+                    showroom_id: newShowroom.showroom_id,
+                    seat_number: `${row}${col}`,
+                    is_booked: false
+                });
+            }
+        }
+
+        // Create the showtime using the new showroom's ID
+        const newShowtime = await Showtime.create({
+            movie_id: movie.movie_id,
+            showroom_id: newShowroom.showroom_id,
+            show_date,
+            show_time,
+            duration
+        });
+
+        res.status(201).json({ message: 'Showtime added successfully', newShowtime });
+
     } catch (error) {
-      console.error("Error in addShowtime: ", error);
-      res.status(500).send({ message: error.message });
+        console.error("Error adding showtime: ", error);
+        return res.status(500).send({ message: "Failed to add new showtime." });
     }
-  },
+},
+
   
 
   // Function to update a showtime
