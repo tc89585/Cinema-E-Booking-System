@@ -3,14 +3,17 @@ import Axios from 'axios';
 import './home.css';
 import Book from './Book';
 import Banner from './Banner';
-import { useNavigate } from "react-router-dom";;
+import { useNavigate } from "react-router-dom";
+import { useAuth } from './Context.js';
+import { jwtDecode } from "jwt-decode"
+
 
 function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [showingNow, setShowingNow] = useState(true);
   const [movies, setMovies] = useState([]);
-
+  const { token } = useAuth();
   const navigate = useNavigate();
 
 
@@ -24,18 +27,25 @@ const handleMovieClick = (movie) => {
   navigate(`/book/${movie.movie_id}`); // Navigate to the booking page with movie ID
 };
 
-  useEffect(() => {
-    // Make a GET request to fetch movies from your backend
-    Axios.get('http://localhost:8080/movies')
-      .then((response) => {
-        // Handle the response data by setting it to the state
-        setMovies(response.data);
-        
-      })
-      .catch((error) => {
-        console.error('Error fetching movies:', error);
-      });
-  }, []);
+useEffect(() => {
+  // Check if the user is logged in and if they are an admin
+  if (token) {
+    const decodedToken = jwtDecode(token);
+    if (decodedToken.role === 'admin') {
+      navigate('/admin');
+      return;
+    }
+  }
+
+  // Fetch movies logic
+  Axios.get('http://localhost:8080/movies')
+    .then((response) => {
+      setMovies(response.data);
+    })
+    .catch((error) => {
+      console.error('Error fetching movies:', error);
+    });
+}, [token, navigate]);
 
   const filteredMovies = movies.filter(
     (movie) =>
