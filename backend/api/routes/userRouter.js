@@ -42,4 +42,5 @@ router.get(
   userController.getBookingHistory
 );
 
+router.post('/changePassword', authenticateUser, changePassword)
 module.exports = router;

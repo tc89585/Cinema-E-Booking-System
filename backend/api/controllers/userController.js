@@ -261,9 +261,41 @@ const forgotPassword = async (req, res) => {
 
 const editProfile = async (req, res) => {
   try {
-    const userId = req.user.user_id;
-    const { firstname, lastname, billing_address, current_password, password, is_subscribed } =
+    const user_id = req.user.user_id;
+    const { firstname, lastname, billing_address, password, is_subscribed } =
       req.body;
+
+    // Query the database for the current user
+    const user = await User.findByPk(user_id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Update user details
+    user.firstname = firstname;
+    user.lastname = lastname;
+    user.billing_address = billing_address;
+    user.is_subscribed = is_subscribed;
+
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
+    }
+
+    // Save the updated user information
+    await user.save();
+
+    res.status(200).json({ message: 'Profile updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const { current_password, new_password } = req.body;
 
     // Query the database for the current user
     const user = await User.findByPk(userId);
@@ -279,22 +311,14 @@ const editProfile = async (req, res) => {
       return res.status(401).json({ error: 'Current password is incorrect' });
     }
 
-    // Update user details
-    user.firstname = firstname;
-    user.lastname = lastname;
-    user.billing_address = billing_address;
-    user.is_subscribed = is_subscribed;
-
-    // If a new password is provided, hash and update it
-    if (password) {
-      const hashedNewPassword = await bcrypt.hash(password, 10);
-      user.password = hashedNewPassword;
-    }
+    // Hash and update the new password
+    const hashedNewPassword = await bcrypt.hash(new_password, 10);
+    user.password = hashedNewPassword;
 
     // Save the updated user information
     await user.save();
 
-    res.status(200).json({ message: 'Profile updated successfully' });
+    res.status(200).json({ message: 'Password changed successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -401,6 +425,7 @@ const getBookingHistory = async (req, res) => {
 };
 
 module.exports = {
+  changePassword,
   createUser,
   login,
   forgotPassword,
