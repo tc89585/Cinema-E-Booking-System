@@ -1,11 +1,15 @@
+// Banner.js
+
 import React from 'react';
-import { useAuth } from './Context'; // Adjust the path to your useAuth hook
-import { jwtDecode } from 'jwt-decode'; // Ensure jwtDecode is correctly imported
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './Context';
+import { jwtDecode } from 'jwt-decode';
 
 function Banner({ searchQuery, handleSearch }) {
   const { token, setToken } = useAuth();
   const isLoggedIn = !!token;
   const decodedToken = isLoggedIn ? jwtDecode(token) : null;
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -16,11 +20,25 @@ function Banner({ searchQuery, handleSearch }) {
     window.location.href = 'http://localhost:3000/login';
   };
 
+  const handleEditProfile = () => {
+    navigate('/profile');
+  };
+
   return (
     <div className="banner">
       <div className="greeting-container">
         {isLoggedIn && decodedToken && (
           <p className="greeting">Hello, {decodedToken.firstname}</p>
+        )}
+      </div>
+
+      <div className="profile">
+        {isLoggedIn ? (
+          <button onClick={handleEditProfile} className="edit-profile-button">
+            Edit Profile
+          </button>
+        ) : (
+          <button onClick={handleLogin}>Edit Profile</button>
         )}
       </div>
 
