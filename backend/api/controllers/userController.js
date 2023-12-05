@@ -23,7 +23,6 @@ const getUserById = async (req, res) => {
   }
 };
 
-
 // Function to generate a random verification code
 const generateVerificationCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -42,8 +41,6 @@ const storeVerificationCode = (email, code) => {
 const getStoredVerificationCode = (email) => {
   return verificationCodeStore[email];
 };
-
-
 
 // New route to send verification code
 const sendCode = async (req, res) => {
@@ -81,7 +78,7 @@ const sendCode = async (req, res) => {
         console.log('Email sent:', info.response);
       }
     });
-    
+
     res.status(200).json({ message: 'Verification code sent successfully' });
   } catch (error) {
     res.status(500).send({ message: error.message });
@@ -108,7 +105,6 @@ const checkCode = async (req, res) => {
     console.error(error);
   }
 };
-
 
 const createUser = async (req, res) => {
   try {
@@ -400,6 +396,37 @@ const getBookingHistory = async (req, res) => {
   }
 };
 
+// In your Node.js/Express server
+
+const verifyPayment = async (req, res) => {
+  console.log('Received payment verification request with body:', req.body);
+  const { card_type, card_number, expiration_date, payment_id } = req.body;
+  const userId = req.user.user_id;
+  console.log('received request with body: ', req.body);
+
+  try {
+    let paymentInfo;
+    if (payment_id) {
+      paymentInfo = await PaymentInformation.findOne({
+        where: { payment_id, user_id: userId },
+      });
+    } else {
+      paymentInfo = await PaymentInformation.findOne({
+        where: { card_type, card_number, expiration_date, user_id: userId },
+      });
+    }
+
+    if (paymentInfo) {
+      res.status(200).json({ message: 'Payment verified successfully' });
+    } else {
+      res.status(400).json({ error: 'Payment details do not match' });
+    }
+  } catch (error) {
+    console.error('Error during payment verification:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 module.exports = {
   createUser,
   login,
@@ -411,5 +438,6 @@ module.exports = {
   getUserById,
   getBookingHistory,
   sendCode,
-  checkCode
+  checkCode,
+  verifyPayment,
 };
