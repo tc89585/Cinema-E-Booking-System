@@ -336,35 +336,43 @@ const AdminController = {
           res.status(500).send({ message: 'Error fetching user data' });
       }
   },
-    addMovie: async (req, res) => {
-      try {
-          const { title, category, director, producer, synopsis, mpaa_rating, cast, Poster_url, trailer_url} = req.body;
-
-          // Validate input
-          if (!title || !category || !director || !producer || !synopsis|| !mpaa_rating || !cast || !Poster_url || !trailer_url ) {
-              return res.status(400).send({ message: "All fields are required" });
-          }
-
-          // Create a new movie record
-          const newMovie = await Movie.create({
-            title,
-            category,
-            director,
-            producer,
-            synopsis,
-            mpaa_rating,
-            cast,
-            Poster_url,
-            trailer_url
-          });
-
-          // Send a success response
-          res.status(201).send({ message: "Movie added successfully", movie: newMovie });
-      } catch (error) {
-          console.error("Error adding movie:", error);
-          res.status(500).send({ message: "Error adding new movie" });
+  addMovie: async (req, res) => {
+    try {
+      const { title, category, director, producer, synopsis, mpaa_rating, cast, Poster_url, trailer_url } = req.body;
+  
+      // Validate input
+      if (!title || !category || !director || !producer || !synopsis || !mpaa_rating || !cast || !Poster_url || !trailer_url) {
+        return res.status(400).send({ message: "All fields are required" });
       }
+  
+      // Check if the movie with the same title already exists
+      const existingMovie = await Movie.findOne({ where: { title } });
+  
+      if (existingMovie) {
+        return res.status(409).send({ message: "Movie with the same title already exists" });
+      }
+  
+      // Create a new movie record
+      const newMovie = await Movie.create({
+        title,
+        category,
+        director,
+        producer,
+        synopsis,
+        mpaa_rating,
+        cast,
+        Poster_url,
+        trailer_url,
+      });
+  
+      // Send a success response
+      res.status(201).send({ message: "Movie added successfully", movie: newMovie });
+    } catch (error) {
+      console.error("Error adding movie:", error);
+      res.status(500).send({ message: "Error adding new movie" });
+    }
   },
+  
   deletePromotion: async (req, res) => {
     try {
         const { promotion_id } = req.params;
