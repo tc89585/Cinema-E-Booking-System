@@ -294,9 +294,11 @@ function Login() {
               Forgot Password?
             </Link>
           )}
-          <button type="submit" className="login-button">
-            {isLogin ? 'Login' : 'Sign Up'}
-          </button>
+          
+            <button type="submit" className="login-button">
+              {isLogin ? 'Login' : 'Sign Up'}
+            </button>
+        
         </form>
         {errorMessage && <div className="error-message">{errorMessage}</div>}
         {isRegistered && (
@@ -306,9 +308,11 @@ function Login() {
         )}
         <p>
           {isLogin ? "Don't have an account? " : 'Already have an account? '}
-          <span className="toggle-link" onClick={handleFormToggle}>
-            {isLogin ? 'Sign Up' : 'Login'}
-          </span>
+          <Link to="/verify">
+            <span className="toggle-link" onClick={handleFormToggle}>
+              {isLogin ? 'Sign Up' : 'Login'}
+            </span>
+          </Link>
         </p>
       </div>
     </div>
