@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Context'
+import axios from 'axios';
+import '../Styles/ManageShowtimes.css'
 
 function ManageUsers() {
   const [users, setUsers] = useState([]);
@@ -7,6 +9,11 @@ function ManageUsers() {
   const [StatusMessage, setStatusMessage] = useState('');
   const { token } = useAuth();
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080/admins";
+  const API_URL1 = process.env.REACT_APP_API_URL || "http://localhost:8080/booking";
+  const [ticketTypes, setTicketTypes] = useState([]);
+  const [newTicketPrice, setNewTicketPrice] = useState('');
+  const [selectedTicketType, setSelectedTicketType] = useState('');
+
 
   useEffect(() => {
     // Fetch users when the component mounts
@@ -42,6 +49,60 @@ function ManageUsers() {
   const handleStatusChange = (email, status) => {
     setUserUpdates(prev => ({ ...prev, [email]: status }));
   };
+  const handleTicketTypeChange = (e) => {
+    setSelectedTicketType(e.target.value);
+  };
+  
+  const handleNewTicketPriceChange = (e) => {
+    setNewTicketPrice(e.target.value);
+  };
+
+  const fetchTicketPrices = () => {
+    axios.get(`${API_URL1}/getTicketPrice`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      setTicketTypes(response.data);
+    })
+    .catch(error => {
+      console.error('Error fetching ticket prices:', error);
+    });
+  };
+  
+
+  const handleEditTicketPrice = async (e) => {
+    e.preventDefault();
+  
+    try {
+      const response = await fetch(`${API_URL}/editTicketPrice`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ticket_type: selectedTicketType,
+          ticket_price: parseFloat(newTicketPrice), // Assuming ticket_price is a numeric value
+        }),
+      });
+  
+      if (response.status === 200) {
+        // Ticket price updated successfully
+        // You can display a success message or update the UI accordingly
+      } else if (response.status === 404) {
+        // Ticket type not found
+        // Display an error message or handle it as needed
+      } else {
+        // Handle other error cases
+      }
+    } catch (error) {
+      // Handle network or server errors
+    }
+  };
+  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,11 +137,11 @@ function ManageUsers() {
   
 
   return (
-    <div>
+    <div className="manage-showtimes-container">
       <h2>Manage Users</h2>
       <form onSubmit={handleSubmit}>
-        {users.map(user => (
-          <div key={user.email}>
+        {users.map((user) => (
+          <div className="form-group" key={user.email}>
             <span>{user.email}: </span>
             <label>
               <input
@@ -104,11 +165,22 @@ function ManageUsers() {
             </label>
           </div>
         ))}
-        {StatusMessage && <div className="statusUpdate-message">{StatusMessage}</div>}
-        <button type="submit">Change Status</button>
+        {StatusMessage && <div className="success-message">{StatusMessage}</div>}
+        <button type="submit" className="submit-button">
+          Change Status
+        </button>
       </form>
+      <div className="form-group">
+          <label htmlFor="ticketType">Ticket Type:</label>
+          <select id="ticketType" name="ticketType" onChange={handleTicketTypeChange} value={selectedTicketType}>
+            {ticketTypes.map((type) => (
+              <option key={type.ticket_type} value={type.ticket_type}>
+                {type.ticket_type}
+              </option>
+            ))}
+          </select>
+        </div>
     </div>
   );
-}
-
+        }
 export default ManageUsers;

@@ -3,3 +3,7 @@ backend/.env
 frontend/yarn.lock
 frontend/package.json
 frontend/package-lock.json
+frontend/yarn.lock
+frontend/package.json
+frontend/package-lock.json
+backend/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node
