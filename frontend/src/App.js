@@ -11,6 +11,7 @@ import SelectSeats from './Components/SelectSeats';
 import { AuthProvider } from './Components/Context';
 import { ProtectedRoute } from './Components/ProtectedRoute';
 import { ErrorPage } from './Components/ErrorPage';
+import OrderConfirmation from './Components/OrderConfirmation';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin/*" element={<AdminDashboard />} />
+          <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route
             path="/profile/"
             element={

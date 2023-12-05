@@ -74,6 +74,7 @@ const SelectTicketTypes = ({ selectedSeats, showtimeId, userId }) => {
         </div>
       ))}
 
+      {console.log('these are the selected Seats: ', selectedSeats)}
       <button
         className="proceed-button"
         onClick={() => {

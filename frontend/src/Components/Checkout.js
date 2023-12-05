@@ -113,60 +113,52 @@ const Checkout = () => {
   };
 
   const handleSubmit = () => {
-    const { selectedSeats, selectedTickets, showtimeId, userId } =
-      location.state || {};
+    // Create an array to store the mapping of seats to ticket types
+    let seatsAndTickets = [];
 
-    // Map selectedSeats to their corresponding ticket types
-    const seatsAndTickets = selectedSeats
-      .map((seatId) => {
-        // Find the ticket type associated with this seat
-        const ticketType = Object.keys(selectedTickets).find(
-          (type) => selectedTickets[type] > 0
+    // Temporary array to hold the seat IDs that have been processed
+    let processedSeatIds = [];
+
+    // Iterate over each ticket type and its count
+    Object.keys(selectedTickets).forEach((ticketType) => {
+      for (let i = 0; i < selectedTickets[ticketType]; i++) {
+        // Find the first unprocessed seat ID
+        const seatId = selectedSeats.find(
+          (id) => !processedSeatIds.includes(id)
         );
 
-        if (ticketType) {
-          selectedTickets[ticketType] -= 1; // Decrement the count for this ticket type
-          return { seatId, ticketType };
+        if (seatId) {
+          // Add the seat and ticket type to the array
+          seatsAndTickets.push({ seat_id: seatId, ticket_type: ticketType });
+
+          // Mark this seat ID as processed
+          processedSeatIds.push(seatId);
         }
-        return null;
-      })
-      .filter((item) => item !== null); // Filter out any null entries
+      }
+    });
 
-    console.log('Sending request with body:', cardDetails);
+    console.log('Seats and Tickets:', seatsAndTickets);
 
-    Axios.post('http://localhost:8080/users/verifyPayment', cardDetails, {
+    // Prepare booking data
+    const bookingData = {
+      user_id: userId,
+      showtime_id: showtimeId,
+      booking_date: new Date().toISOString().split('T')[0],
+      total_price: discountedTotal,
+      seatsAndTickets,
+    };
+
+    // Make POST request to /createBooking with bookingData
+    Axios.post('http://localhost:8080/bookings/createBooking', bookingData, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then(() => {
-        // Create booking data
-        const bookingData = {
-          user_id: userId,
-          showtime_id: showtimeId,
-          booking_date: new Date().toISOString().split('T')[0], // current date
-          total_price: discountedTotal,
-          seatsAndTickets,
-        };
-
-        // Make POST request to /createBooking here with bookingData
-        Axios.post(
-          'http://localhost:8080/bookings/createBooking',
-          bookingData,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        )
-          .then((bookingResponse) => {
-            console.log('Booking successful:', bookingResponse.data);
-            navigate('/order-confirmation', { state: bookingResponse.data });
-          })
-          .catch((bookingError) => {
-            console.error('Booking failed:', bookingError);
-            // Handle booking error
-          });
+      .then((bookingResponse) => {
+        console.log('Booking successful:', bookingResponse.data);
+        navigate('/order-confirmation', { state: bookingData });
       })
-      .catch((error) => {
-        console.error('Payment verification failed:', error);
-        // Handle error response
+      .catch((bookingError) => {
+        console.error('Booking failed:', bookingError);
+        // Handle booking error
       });
   };
 
