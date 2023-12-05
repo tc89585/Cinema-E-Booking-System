@@ -96,9 +96,9 @@ const AdminController = {
 
   // Function to delete a movie
   deleteMovie: async (req, res) => {
-    const { movieId } = req.params;
+    const { movie_id } = req.params;
     try {
-      const movie = await Movie.findByPk(movieId);
+      const movie = await Movie.findByPk(movie_id);
       if (!movie) {
         return res.status(404).send({ message: 'Movie not found' });
       }
