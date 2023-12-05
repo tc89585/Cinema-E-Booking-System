@@ -1,114 +1,229 @@
-import React, { useState } from 'react';
-import './checkout.css';
+import React, { useState, useEffect } from 'react';
+import Axios from 'axios';
+import { useAuth } from './Context';
+import './Checkout.css';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
-function Checkout() {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [zipCode, setZipCode] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('CreditCard');
+const Checkout = () => {
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+  const [cardDetails, setCardDetails] = useState({
+    card_type: '',
+    card_number: '',
+    expiration_date: '',
+  });
+  const { token } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { totalPrice, selectedSeats, selectedTickets, showtimeId, userId } =
+    location.state || {};
+  const [discountCode, setDiscountCode] = useState('');
+  const [discountedTotal, setDiscountedTotal] = useState(totalPrice);
+  const [error, setError] = useState('');
 
-  const handleFirstNameChange = (e) => {
-    setFirstName(e.target.value);
+  const fetchPaymentMethods = () => {
+    Axios.get(`http://localhost:8080/users/payment-methods`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((response) => {
+        setPaymentMethods(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching payment methods:', error);
+      });
   };
 
-  const handleLastNameChange = (e) => {
-    setLastName(e.target.value);
+  useEffect(() => {
+    fetchPaymentMethods();
+  }, [userId]);
+
+  const handlePaymentMethodChange = (event) => {
+    const methodId = event.target.value;
+    setSelectedPaymentMethod(methodId);
+
+    const selectedMethod = paymentMethods.find(
+      (method) => method.payment_id.toString() === methodId
+    );
+    if (selectedMethod) {
+      setCardDetails({
+        card_type: selectedMethod.card_type,
+        card_number: selectedMethod.card_number,
+        expiration_date: selectedMethod.expiration_date,
+      });
+    } else {
+      // Reset card details if 'new' is selected or no method is found
+      setCardDetails({ card_type: '', card_number: '', expiration_date: '' });
+    }
   };
 
-  const handleAddressChange = (e) => {
-    setAddress(e.target.value);
-  };
-
-  const handleCityChange = (e) => {
-    setCity(e.target.value);
-  };
-
-  const handleZipCodeChange = (e) => {
-    setZipCode(e.target.value);
-  };
-
-  const handlePaymentMethodChange = (e) => {
-    setPaymentMethod(e.target.value);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Add logic to submit the order and proceed to the order confirmation page
-    console.log('Order submitted:', {
-      firstName,
-      lastName,
-      address,
-      city,
-      zipCode,
-      paymentMethod,
+  const handleCardDetailChange = (event) => {
+    setCardDetails({
+      ...cardDetails,
+      [event.target.name]: event.target.value,
     });
+  };
+
+  const handleAddNewCard = () => {
+    console.log('adding NEW card with details: ', cardDetails);
+    if (paymentMethods.length >= 3) {
+      setError('You cannot have more than 3 payment methods.');
+      return;
+    }
+    Axios.post(`http://localhost:8080/users/payment-methods`, cardDetails, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(() => {
+        fetchPaymentMethods(); // Refresh the list of payment methods
+      })
+      .catch((error) => {
+        console.error('Error adding new card:', error);
+        setError('Error adding new card.');
+        // Handle error response
+      });
+  };
+
+  const handleApplyDiscount = () => {
+    Axios.get(
+      `http://localhost:8080/bookings/getDiscountRateByDescription/${discountCode}`
+    )
+      .then((response) => {
+        // discountRate is now an integer representing the amount to subtract
+        const discountAmount = parseInt(response.data.discountRate, 10);
+
+        console.log(
+          'Total Price:',
+          totalPrice,
+          'Discount Amount:',
+          discountAmount
+        );
+
+        if (isNaN(totalPrice) || isNaN(discountAmount)) {
+          console.error('Invalid total price or discount amount');
+          // Optionally set an error message in state to display to the user
+          return;
+        }
+
+        const newDiscountedTotal = totalPrice - discountAmount;
+        setDiscountedTotal(Math.max(0, newDiscountedTotal)); // Ensure total doesn't go below 0
+      })
+      .catch((error) => {
+        console.error('Error applying discount:', error);
+      });
+  };
+
+  const handleSubmit = () => {
+    const { selectedSeats, selectedTickets, showtimeId, userId } =
+      location.state || {};
+
+    // Map selectedSeats to their corresponding ticket types
+    const seatsAndTickets = selectedSeats
+      .map((seatId) => {
+        // Find the ticket type associated with this seat
+        const ticketType = Object.keys(selectedTickets).find(
+          (type) => selectedTickets[type] > 0
+        );
+
+        if (ticketType) {
+          selectedTickets[ticketType] -= 1; // Decrement the count for this ticket type
+          return { seatId, ticketType };
+        }
+        return null;
+      })
+      .filter((item) => item !== null); // Filter out any null entries
+
+    console.log('Sending request with body:', cardDetails);
+
+    Axios.post('http://localhost:8080/users/verifyPayment', cardDetails, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(() => {
+        // Create booking data
+        const bookingData = {
+          user_id: userId,
+          showtime_id: showtimeId,
+          booking_date: new Date().toISOString().split('T')[0], // current date
+          total_price: discountedTotal,
+          seatsAndTickets,
+        };
+
+        // Make POST request to /createBooking here with bookingData
+        Axios.post(
+          'http://localhost:8080/bookings/createBooking',
+          bookingData,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
+          .then((bookingResponse) => {
+            console.log('Booking successful:', bookingResponse.data);
+            navigate('/order-confirmation', { state: bookingResponse.data });
+          })
+          .catch((bookingError) => {
+            console.error('Booking failed:', bookingError);
+            // Handle booking error
+          });
+      })
+      .catch((error) => {
+        console.error('Payment verification failed:', error);
+        // Handle error response
+      });
   };
 
   return (
     <div className="checkout-container">
       <h2>Checkout</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
+      <p>Total Price: ${totalPrice ? totalPrice.toFixed(2) : '0.00'}</p>
+      <input
+        type="text"
+        value={discountCode}
+        onChange={(e) => setDiscountCode(e.target.value)}
+        placeholder="Discount Code"
+      />
+      <button onClick={handleApplyDiscount}>Apply Discount</button>
+      <p>Discounted Total: ${discountedTotal.toFixed(2)}</p>
+      <div className="checkout-form">
+        <select
+          value={selectedPaymentMethod}
+          onChange={handlePaymentMethodChange}
+        >
+          {paymentMethods.map((method) => (
+            <option key={method.payment_id} value={method.payment_id}>
+              {method.card_type} - ****{method.card_number.slice(-4)}
+            </option>
+          ))}
+          <option value="new">Use a new card</option>
+        </select>
+
+        <div className="card-details">
           <input
-            type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={handleFirstNameChange}
-            required
+            name="card_type"
+            value={cardDetails.card_type}
+            onChange={handleCardDetailChange}
+            placeholder="Card Type"
+          />
+          <input
+            name="card_number"
+            value={cardDetails.card_number}
+            onChange={handleCardDetailChange}
+            placeholder="Card Number"
+          />
+          <input
+            name="expiration_date"
+            value={cardDetails.expiration_date}
+            onChange={handleCardDetailChange}
+            placeholder="Expiration Date"
+            type="date"
           />
         </div>
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={handleLastNameChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="Address"
-            value={address}
-            onChange={handleAddressChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="City"
-            value={city}
-            onChange={handleCityChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="Zip Code"
-            value={zipCode}
-            onChange={handleZipCodeChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Payment Method:</label>
-          <select value={paymentMethod} onChange={handlePaymentMethodChange}>
-            <option value="CreditCard">Credit Card</option>
-            <option value="PayPal">PayPal</option>
-            <option value="Stripe">Stripe</option>
-          </select>
-        </div>
-        <button type="submit" className="checkout-button">
-          Confirm Order
-        </button>
-      </form>
+
+        {error && <p className="error-message">{error}</p>}
+        <button onClick={handleAddNewCard}>Add New Card</button>
+        <button onClick={handleSubmit}>Submit Payment</button>
+        <button onClick={() => navigate(-1)}>Back</button>
+      </div>
     </div>
   );
-}
+};
 
 export default Checkout;
