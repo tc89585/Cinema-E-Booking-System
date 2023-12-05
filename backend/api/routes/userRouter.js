@@ -42,4 +42,6 @@ router.get(
   userController.getBookingHistory
 );
 
+router.post('/verifyPayment', authenticateUser, userController.verifyPayment);
+
 module.exports = router;
