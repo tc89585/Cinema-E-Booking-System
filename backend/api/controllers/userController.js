@@ -128,6 +128,8 @@ const createUser = async (req, res) => {
       is_subscribed
     });
 
+    const { createTransport } = require('nodemailer');
+
     // Set up nodemailer transporter
     const transporter = createTransport({
       host: 'smtp-relay.brevo.com',
@@ -170,7 +172,7 @@ const createUser = async (req, res) => {
   }
 };
 
-module.exports = createUser;
+
 
 const login = async (req, res) => {
   const { email, password } = req.body;
