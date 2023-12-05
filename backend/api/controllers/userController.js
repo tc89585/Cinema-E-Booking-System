@@ -402,6 +402,7 @@ const getBookingHistory = async (req, res) => {
 // In your Node.js/Express server
 
 const verifyPayment = async (req, res) => {
+  console.log('Received payment verification request with body:', req.body);
   const { card_type, card_number, expiration_date, payment_id } = req.body;
   const userId = req.user.user_id;
   console.log('received request with body: ', req.body);
@@ -424,7 +425,7 @@ const verifyPayment = async (req, res) => {
       res.status(400).json({ error: 'Payment details do not match' });
     }
   } catch (error) {
-    console.error(error);
+    console.error('Error during payment verification:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
