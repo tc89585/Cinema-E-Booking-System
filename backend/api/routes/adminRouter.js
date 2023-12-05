@@ -13,7 +13,7 @@ router.post('/createAdmin', adminAuthMiddleware, adminController.createAdmin);
 router.post('/createPromotion', adminAuthMiddleware, adminController.createPromotion);
 
 // Route to update movie information
-router.put('/updateMovieInfo', adminAuthMiddleware, adminController.updateMovieInfo);
+router.patch('/updateMovieInfo', adminAuthMiddleware, adminController.updateMovieInfo);
 
 // Route to delete a movie
 router.delete('/deleteMovie/:movie_id', adminAuthMiddleware, adminController.deleteMovie);

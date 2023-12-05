@@ -79,20 +79,21 @@ const AdminController = {
   },
 
   // Function to update movie information
-  updateMovieInfo: async (req, res) => {
+    updateMovieInfo: async (req, res) => {
     const { movieId, updateData } = req.body;
     try {
       const movie = await Movie.findByPk(movieId);
       if (!movie) {
         return res.status(404).send({ message: 'Movie not found' });
       }
+      // Object.assign is suitable for partial updates
       Object.assign(movie, updateData);
       await movie.save();
       res.status(200).json({ message: 'Movie updated successfully', movie });
     } catch (error) {
       res.status(500).send({ message: error.message });
     }
-  },
+},
 
   // Function to delete a movie
   deleteMovie: async (req, res) => {
