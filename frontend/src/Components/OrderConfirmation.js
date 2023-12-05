@@ -1,25 +1,37 @@
 import { useLocation } from 'react-router-dom';
+import './OrderConfirmation.css';
 
 const OrderConfirmation = () => {
   const location = useLocation();
-  const bookingData = location.state;
-  const seats = location.state?.selectedSeats || []; // Provide a default empty array
+  const { seatsAndTickets, total_price, showtime_id, user_id } =
+    location.state || {};
 
-  // Now, it's safe to use 'join' as 'seats' is guaranteed to be an array
-  const seatNumbers = seats.join(', ');
+  const seatNumbers = seatsAndTickets
+    ? seatsAndTickets
+        .map(
+          (seatTicket) =>
+            `Seat ${seatTicket.seat_id} (${seatTicket.ticket_type})`
+        )
+        .join(', ')
+    : 'No seats selected';
 
   return (
-    <div>
-      <h1>Order Confirmation</h1>
-      {bookingData && (
-        <div>
-          {/* Display booking details here using bookingData */}
-          <p>Total Price: {bookingData.total_price}</p>
-          <p>Showtime ID: {bookingData.showtime_id}</p>
-          <p>User ID: {bookingData.user_id}</p>
-          <p>Seats: {seatNumbers}</p>
-        </div>
-      )}
+    <div className="order-confirmation-container">
+      <h1 className="order-confirmation-title">Order Confirmation</h1>
+      <div className="order-confirmation-details">
+        <p>
+          <strong>Total Price:</strong> ${total_price}
+        </p>
+        <p>
+          <strong>Showtime ID:</strong> {showtime_id}
+        </p>
+        <p>
+          <strong>User ID:</strong> {user_id}
+        </p>
+        <p>
+          <strong>Seats:</strong> {seatNumbers}
+        </p>
+      </div>
     </div>
   );
 };

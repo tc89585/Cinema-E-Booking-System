@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
 import { useAuth } from './Context';
-import './Checkout.css';
+import './checkout.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
@@ -154,7 +154,9 @@ const Checkout = () => {
     })
       .then((bookingResponse) => {
         console.log('Booking successful:', bookingResponse.data);
-        navigate('/order-confirmation', { state: bookingData });
+        navigate('/order-confirmation', {
+          state: { ...bookingData, seatsAndTickets },
+        });
       })
       .catch((bookingError) => {
         console.error('Booking failed:', bookingError);
