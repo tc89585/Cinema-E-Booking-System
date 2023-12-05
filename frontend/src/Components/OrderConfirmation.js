@@ -1,5 +1,6 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import './OrderConfirmation.css';
+ 
 
 const OrderConfirmation = () => {
   const location = useLocation();
@@ -31,6 +32,9 @@ const OrderConfirmation = () => {
         <p>
           <strong>Seats:</strong> {seatNumbers}
         </p>
+      </div>
+      <div className="back-to-home">
+        <Link to="/">Back to Homepage</Link>
       </div>
     </div>
   );
